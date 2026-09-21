@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Carreira - Auditor de Controle Externo (TCE-MG)</title>
+    <style>
+        :root {
+            --primary-color: #2f5496;
+            --secondary-color: #4472c4;
+            --bg-light: #f8f9fa;
+            --border-color: #d9d9d9;
+            --input-bg: #dce6f1;
+            --output-bg: #e2efda;
+            --text-color: #333;
+            --blue-highlight: #004085;
+            --blue-highlight-bg: #e8f4f8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: var(--bg-light);
+            color: var(--text-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 15px 25px;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group-checkbox input[type="checkbox"] { 
+            width: 20px; height: 20px; cursor: pointer; 
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.92em;
+        }
+
+        input, select {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.92em;
+            background-color: var(--input-bg);
+            width: 200px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+            text-align: right;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 6px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9fbfd;
+        }
+
+        input:disabled, select:disabled { 
+            background-color: #e0e0e0 !important; 
+            color: #888888; 
+            cursor: not-allowed; 
+            opacity: 0.5; 
+            border-color: #ccc; 
+        }
+
+        .col-destaque {
+            font-weight: bold;
+        }
+
+        .col-liquido {
+            background-color: var(--output-bg) !important;
+            font-weight: bold;
+            color: #1e4620;
+        }
+
+        .valor-corrigido {
+            color: var(--blue-highlight) !important;
+            font-weight: bold;
+            background-color: var(--blue-highlight-bg) !important;
+        }
+
+        .constantes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px 20px;
+            font-size: 0.9em;
+        }
+
+        .constante-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+    </style>
+</head>
+<body>
+
+    <h1>Simulador de Carreira - Auditor de Controle Externo (TCE-MG)</h1>
+    <div class="subtitle">Base de Cálculo: Lei Estadual nº 25.808/2026</div>
+
+    <!-- Painel de Parâmetros -->
+    <div class="card">
+        <h3>Parâmetros do Servidor</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="anoInicial">Ano Atual na Carreira:</label>
+                <select id="anoInicial" onchange="calcularSimulacao()"></select>
+            </div>
+            <div class="form-group">
+                <label for="pontosADE">Pontos de ADE (0 a 100):</label>
+                <input type="number" id="pontosADE" value="100" min="0" max="100" onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group">
+                <label for="avancoTitulacao">Avanço por Titulação:</label>
+                <select id="avancoTitulacao" onchange="calcularSimulacao()">
+                    <option value="0">Nenhuma (0 padrões)</option>
+                    <option value="1">Mestrado (+1 padrão)</option>
+                    <option value="2">Doutorado (+2 padrões)</option>
+                    <option value="3">Mestrado + Doutorado (+3 padrões)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="correcaoInflacao">Projeção Reajuste (%):</label>
+                <input type="number" id="correcaoInflacao" value="0.0" step="0.5" min="0" onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group">
+                <label for="regimePrevidencia">Regime de Previdência:</label>
+                <select id="regimePrevidencia" onchange="calcularSimulacao()">
+                    <option value="NOVO_PREVCOM">Novo com Prevcom-MG</option>
+                    <option value="NOVO_SEM_PREVCOM">Novo sem Prevcom-MG</option>
+                    <option value="ANTIGO_RPPS">Antigo RPPS (Integral 14%)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="aliquotaPrevcom">Alíquota Prevcom (%):</label>
+                <input type="number" id="aliquotaPrevcom" value="7.5" step="0.5" min="0" max="15" onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group">
+                <label for="qtdDependentesIRPF">Dependentes para IRPF:</label>
+                <input type="number" id="qtdDependentesIRPF" value="0" min="0" onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group">
+                <label for="funcaoGratificada">Função / Cargo Comissionado:</label>
+                <select id="funcaoGratificada" onchange="calcularSimulacao()"></select>
+            </div>
+            <div class="form-group form-group-checkbox">
+                <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
+                <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group">
+                <label for="outrosDescontos">Outros descontos em folha (R$):</label>
+                <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
+            </div>
+
+
+            <!-- Filhos Individuais (Até 3) -->
+            <div class="form-group">
+                <label for="filho1Tipo">Filho 1 - Tipo Auxílio:</label>
+                <select id="filho1Tipo" onchange="calcularSimulacao()">
+                    <option value="NENHUM">Nenhum</option>
+                    <option value="PADRAO">Padrão (Normal)</option>
+                    <option value="ESPECIAL">Especial (PCD)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filho1Idade">Filho 1 - Idade:</label>
+                <input type="number" id="filho1Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+            </div>
+
+            <div class="form-group">
+                <label for="filho2Tipo">Filho 2 - Tipo  Auxílio:</label>
+                <select id="filho2Tipo" onchange="calcularSimulacao()">
+                    <option value="NENHUM">Nenhum</option>
+                    <option value="PADRAO">Padrão (Normal)</option>
+                    <option value="ESPECIAL">Especial (PCD)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filho2Idade">Filho 2 - Idade:</label>
+                <input type="number" id="filho2Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+            </div>
+
+            <div class="form-group">
+                <label for="filho3Tipo">Filho 3 - Tipo  Auxílio:</label>
+                <select id="filho3Tipo" onchange="calcularSimulacao()">
+                    <option value="NENHUM">Nenhum</option>
+                    <option value="PADRAO">Padrão (Normal)</option>
+                    <option value="ESPECIAL">Especial (PCD)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filho3Idade">Filho 3 - Idade:</label>
+                <input type="number" id="filho3Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela Principal de Simulação -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ano</th>
+                    <th>Padrão Efetivo</th>
+                    <th>Vencimento Base</th>
+                    <th>ADE</th>
+                    <th>Função Grat.</th>
+                    <th>Abate-Teto</th>
+                    <th>Aux. Alimentação</th>
+                    <th>Aux. Saúde</th>
+                    <th>Aux. Creche</th>
+                    <th>Remuneração Bruta Total</th>
+                    <th>Desc. Previdência</th>
+                    <th>Desc. Prevcom</th>
+                    <th>Desc. IRPF</th>
+                    <th>ASSCONTAS (Associação)</th>
+                    <th>Taxa desconto em folha (SERPRO)</th>
+                    <th>Outros descontos</th>
+                    <th>Total Descontos</th>
+                    <th>Remuneração Líquida Final</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaCorpo"></tbody>
+        </table>
+    </div>
+
+    <!-- Constantes Legais no Rodapé -->
+    <div class="card">
+        <h3>Constantes Utilizadas (Lei 25.808/2026)</h3>
+        <div class="constantes-grid">
+            <div class="constante-item"><span>Teto Constitucional:</span><strong id="c_tetoConstitucional"></strong></div>
+            <div class="constante-item"><span>Valor do Ponto de ADE (NS):</span><strong id="c_pontoADE"></strong></div>
+            <div class="constante-item"><span>Auxílio-Alimentação:</span><strong id="c_auxAlimentacao"></strong></div>
+            <div class="constante-item"><span>Auxílio-Saúde:</span><strong id="c_auxSaude"></strong></div>
+            <div class="constante-item"><span>Auxílio-Creche Padrão (unit.):</span><strong id="c_auxCreche"></strong></div>
+            <div class="constante-item"><span>Auxílio-Creche Especial (unit.):</span><strong id="c_auxCrecheEsp"></strong></div>
+            <div class="constante-item"><span>Idade Máxima Auxílio-Creche:</span><strong id="c_idadeMaxCreche"></strong></div>
+            <div class="constante-item"><span>Alíquota RPPS (FFP):</span><strong id="c_aliquotaRpps"></strong></div>
+            <div class="constante-item"><span>Dedução RPPS:</span><strong id="c_deducaoRpps"></strong></div>
+            <div class="constante-item"><span>Dedução IRPF por Dependente:</span><strong id="c_deducaoDepIRPF"></strong></div>
+            <div class="constante-item"><span>Teto RGPS / Desconto RPPS Teto:</span><strong id="c_tetoRGPS"></strong></div>
+            <div class="constante-item"><span>Mensalidade ASSCONTAS:</span><strong id="c_asscontas"></strong></div>
+            <div class="constante-item"><span>Taxa Desconto em Folha (SERPRO):</span><strong id="c_serpro"></strong></div>
+            <div class="constante-item"><span>Outros Descontos Cadastrados:</span><strong id="c_outrosDescontos"></strong></div>
+        </div>
+    </div>
+
+    <script>
+        const CHAVE_STORAGE = "simulador_tcemg_estado_v6";
+
+        const CONSTANTES = {
+            PADRAO_MAXIMO: 94,
+            VALOR_PONTO_ADE_NS: 76.16,
+            AUXILIO_ALIMENTACAO: 2968.00,
+            AUXILIO_SAUDE: 1100.00,
+            AUXILIO_CRECHE_PADRAO: 1200.00,
+            AUXILIO_CRECHE_ESPECIAL: 1800.00,
+            IDADE_MAXIMA_CRECHE: 6,
+            DEDUCAO_DEPENDENTE_IRPF: 189.59,
+            TETO_RGPS: 8475.55,
+            DESCONTO_RPPS_INSS_TETO: 988.09,
+            ALIQUOTA_MAX_IRPF: 0.275,
+            PARCELA_DEDUZIR_IRPF: 908.73,
+            ALIQUOTA_RPPS_INTEGRAL: 0.16,
+            PARCELA_DEDUZIR_RPPS: 247.32,
+            MENSALIDADE_ASSCONTAS: 26.48,
+            TAXA_SERPRO: 3.08,
+            TETO_CONSTITUCIONAL: 46366.19
+        };
+
+        const TABELA_VENCIMENTOS = {
+            50: 10265.97, 51: 10614.99, 52: 10975.98, 53: 11349.13, 54: 11735.04,
+            55: 12134.12, 56: 12546.77, 57: 12973.37, 58: 13414.53, 59: 13870.65,
+            60: 14342.32, 61: 14829.95, 62: 15334.14, 63: 15855.48, 64: 16394.56,
+            65: 16952.00, 66: 17528.38, 67: 18124.30, 68: 18740.57, 69: 19377.78,
+            70: 20036.54, 71: 20717.82, 72: 21422.24, 73: 22150.60, 74: 22903.68,
+            75: 23682.50, 76: 24487.64, 77: 25320.30, 78: 26181.28, 79: 27071.38,
+            80: 27612.86, 81: 28165.11, 82: 28728.33, 83: 29302.92, 84: 29889.07,
+            85: 30486.79, 86: 31096.48, 87: 31718.33, 88: 32352.75, 89: 32999.74,
+            90: 33659.68, 91: 34332.79, 92: 35019.47, 93: 35719.90, 94: 36434.29
+        };
+
+        const FUNCOES_GRATIFICADAS = {
+            "Nenhuma": 0.00,
+            "FG-1": 14812.50, "FG-2": 13465.91, "FG-3": 12119.32, "FG-4": 7877.56,
+            "FG-5": 6435.63, "FG-6": 6435.63, "FG-7": 3366.47,
+            "FGP-1": 12119.32, "FGP-2": 6732.96, "FGP-3": 4713.06, "FGP-4": 3366.47, "FGP-5": 2019.88,
+            "Chefe de Gabinete (Opção 65%)": 19599.43, "Diretor (Opção 65%)": 19599.43
+        };
+
+        //const PADROES_BASE_CARREIRA = [59, 60, 63, 64, 68, 69, 72, 73, 76, 77, 82, 83, 86, 87, 90, 91, 94];
+        const PADROES_BASE_CARREIRA = [ { ano: 1, padraoBase: 59 }, 
+                                        { ano: 2, padraoBase: 60 }, 
+                                        { ano: 3, padraoBase: 63 }, 
+                                        { ano: 4, padraoBase: 64 }, 
+                                        { ano: 5, padraoBase: 68 }, 
+                                        { ano: 6, padraoBase: 69 }, 
+                                        { ano: 7, padraoBase: 72 }, 
+                                        { ano: 8, padraoBase: 73 }, 
+                                        { ano: 9, padraoBase: 76 }, 
+                                        { ano: 10, padraoBase: 77 }, 
+                                        { ano: 11, padraoBase: 82 }, 
+                                        { ano: 12, padraoBase: 83 }, 
+                                        { ano: 13, padraoBase: 86 }, 
+                                        { ano: 14, padraoBase: 87 }, 
+                                        { ano: 15, padraoBase: 90 }, 
+                                        { ano: 16, padraoBase: 91 }, 
+                                        { ano: 17, padraoBase: 94 } 
+                                    ];
+
+        function formatarMoeda(valor) {
+            return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function salvarEstado() {
+            const estado = {
+                anoInicial: document.getElementById('anoInicial').value,
+                pontosADE: document.getElementById('pontosADE').value,
+                avancoTitulacao: document.getElementById('avancoTitulacao').value,
+                correcaoInflacao: document.getElementById('correcaoInflacao').value,
+                regimePrevidencia: document.getElementById('regimePrevidencia').value,
+                aliquotaPrevcom: document.getElementById('aliquotaPrevcom').value,
+                qtdDependentesIRPF: document.getElementById('qtdDependentesIRPF').value,
+                funcaoGratificada: document.getElementById('funcaoGratificada').value,
+                filho1Tipo: document.getElementById('filho1Tipo').value,
+                filho1Idade: document.getElementById('filho1Idade').value,
+                filho2Tipo: document.getElementById('filho2Tipo').value,
+                filho2Idade: document.getElementById('filho2Idade').value,
+                filho3Tipo: document.getElementById('filho3Tipo').value,
+                filho3Idade: document.getElementById('filho3Idade').value,
+                associadoAsscontas: document.getElementById('associadoAsscontas').checked,
+                outrosDescontos: document.getElementById('outrosDescontos').value
+            };
+            try {
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estado));
+            } catch (e) {
+                console.warn("localStorage inacessível:", e);
+            }
+        }
+
+        function carregarEstado() {
+            try {
+                const salvo = localStorage.getItem(CHAVE_STORAGE);
+                if (salvo) {
+                    const estado = JSON.parse(salvo);
+                    if (estado.anoInicial !== undefined) document.getElementById('anoInicial').value = estado.anoInicial;
+                    if (estado.pontosADE !== undefined) document.getElementById('pontosADE').value = estado.pontosADE;
+                    if (estado.avancoTitulacao !== undefined) document.getElementById('avancoTitulacao').value = estado.avancoTitulacao;
+                    if (estado.correcaoInflacao !== undefined) document.getElementById('correcaoInflacao').value = estado.correcaoInflacao;
+                    if (estado.regimePrevidencia !== undefined) document.getElementById('regimePrevidencia').value = estado.regimePrevidencia;
+                    if (estado.aliquotaPrevcom !== undefined) document.getElementById('aliquotaPrevcom').value = estado.aliquotaPrevcom;
+                    if (estado.qtdDependentesIRPF !== undefined) document.getElementById('qtdDependentesIRPF').value = estado.qtdDependentesIRPF;
+                    if (estado.funcaoGratificada !== undefined) document.getElementById('funcaoGratificada').value = estado.funcaoGratificada;
+                    if (estado.filho1Tipo !== undefined) document.getElementById('filho1Tipo').value = estado.filho1Tipo;
+                    if (estado.filho1Idade !== undefined) document.getElementById('filho1Idade').value = estado.filho1Idade;
+                    if (estado.filho2Tipo !== undefined) document.getElementById('filho2Tipo').value = estado.filho2Tipo;
+                    if (estado.filho2Idade !== undefined) document.getElementById('filho2Idade').value = estado.filho2Idade;
+                    if (estado.filho3Tipo !== undefined) document.getElementById('filho3Tipo').value = estado.filho3Tipo;
+                    if (estado.filho3Idade !== undefined) document.getElementById('filho3Idade').value = estado.filho3Idade;
+                    if (estado.associadoAsscontas !== undefined) document.getElementById('associadoAsscontas').checked = estado.associadoAsscontas;
+                    if (estado.outrosDescontos !== undefined) document.getElementById('outrosDescontos').value = estado.outrosDescontos;
+                }
+            } catch (e) {
+                console.warn("Erro ao ler estado do localStorage:", e);
+            }
+        }
+
+        function inicializarInterface() {
+            // Preenche opções do padrão inicial (TC-50 a TC-94)
+            const selectAno = document.getElementById('anoInicial');
+            selectAno.innerHTML = '';
+            for (let a = 1; a <= 17; a++) {
+                let opt = document.createElement('option');
+                opt.value = a;
+                opt.innerText = `${a}º Ano` + (a === 1 ? ' (Ingresso / TC-59)' : '');
+                selectAno.appendChild(opt);
+            }
+            selectAno.value = "1";
+
+            document.getElementById('c_pontoADE').innerText = formatarMoeda(CONSTANTES.VALOR_PONTO_ADE_NS);
+            document.getElementById('c_auxAlimentacao').innerText = formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO);
+            document.getElementById('c_auxSaude').innerText = formatarMoeda(CONSTANTES.AUXILIO_SAUDE);
+            document.getElementById('c_auxCreche').innerText = formatarMoeda(CONSTANTES.AUXILIO_CRECHE_PADRAO);
+            document.getElementById('c_auxCrecheEsp').innerText = formatarMoeda(CONSTANTES.AUXILIO_CRECHE_ESPECIAL);
+            document.getElementById('c_idadeMaxCreche').innerText = `${CONSTANTES.IDADE_MAXIMA_CRECHE} anos`;
+            document.getElementById('c_aliquotaRpps').innerText = (100.0 * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) + '%';
+            document.getElementById('c_deducaoRpps').innerText = formatarMoeda(CONSTANTES.PARCELA_DEDUZIR_RPPS);
+            document.getElementById('c_deducaoDepIRPF').innerText = formatarMoeda(CONSTANTES.DEDUCAO_DEPENDENTE_IRPF);
+            document.getElementById('c_tetoRGPS').innerText = `${formatarMoeda(CONSTANTES.TETO_RGPS)} (${formatarMoeda(CONSTANTES.DESCONTO_RPPS_INSS_TETO)})`;
+            document.getElementById('c_asscontas').innerText = formatarMoeda(CONSTANTES.MENSALIDADE_ASSCONTAS);
+            document.getElementById('c_serpro').innerText = formatarMoeda(CONSTANTES.TAXA_SERPRO);
+            document.getElementById('c_tetoConstitucional').innerText = formatarMoeda(CONSTANTES.TETO_CONSTITUCIONAL);
+
+
+            const selectFG = document.getElementById('funcaoGratificada');
+            selectFG.innerHTML = '';
+            for (let fg in FUNCOES_GRATIFICADAS) {
+                let opt = document.createElement('option');
+                opt.value = fg;
+                opt.innerText = `${fg} (${formatarMoeda(FUNCOES_GRATIFICADAS[fg])})`;
+                selectFG.appendChild(opt);
+            }
+
+            carregarEstado();
+            calcularSimulacao();
+        }
+
+        function calcularAuxilioCrecheAno(filhos, anoSimulacao) {
+            let total = 0.0;
+            filhos.forEach(filho => {
+                if (filho.tipo !== "NENHUM") {
+                    let idadeNoAno = filho.idadeInicial + (anoSimulacao - 1);
+                    if (idadeNoAno <= CONSTANTES.IDADE_MAXIMA_CRECHE) {
+                        if (filho.tipo === "PADRAO") {
+                            total += CONSTANTES.AUXILIO_CRECHE_PADRAO;
+                        } else if (filho.tipo === "ESPECIAL") {
+                            total += CONSTANTES.AUXILIO_CRECHE_ESPECIAL;
+                        }
+                    }
+                }
+            });
+            return total;
+        }
+
+        function atualizarCamposFilhos() {
+            for (let i = 1; i <= 3; i++) {
+                const selectTipo = document.getElementById(`filho${i}Tipo`);
+                const inputIdade = document.getElementById(`filho${i}Idade`);
+                if (selectTipo && inputIdade) {
+                    inputIdade.disabled = (selectTipo.value === "NENHUM");
+                }
+            }
+            const selectRegime = document.getElementById(`regimePrevidencia`);
+            const inputAliquotaPrevcom = document.getElementById(`aliquotaPrevcom`);
+            if (selectRegime && inputAliquotaPrevcom) {
+                inputAliquotaPrevcom.disabled = (selectRegime.value !== "NOVO_PREVCOM");
+            }
+        }
+
+        function ocultarColunasZero() {
+            const tabela = document.querySelector('.table-container table');
+            if (!tabela) return;
+
+            const headers = tabela.querySelectorAll('thead th');
+            const linhas = tabela.querySelectorAll('tbody tr');
+            if (linhas.length === 0) return;
+
+            const numColunas = headers.length;
+
+            for (let colIndex = 0; colIndex < numColunas; colIndex++) {
+                let todosZero = true;
+
+                linhas.forEach(linha => {
+                    const celula = linha.children[colIndex];
+                    if (celula) {
+                        const texto = celula.innerText.trim();
+                        // Extrai o valor numérico (ex: "R$ 0,00" -> 0, "R$ 1.200,00" -> 1200)
+                        const valorNumerico = parseFloat(texto.replace(/[^\d,-]/g, '').replace(',', '.'));
+
+                        if (!isNaN(valorNumerico) && Math.abs(valorNumerico) > 0.001) {
+                            todosZero = false;
+                        }
+                    }
+                });
+
+                // Se todos os valores da coluna forem zero, oculta o cabeçalho e as células
+                const displayVal = todosZero ? 'none' : '';
+                headers[colIndex].style.display = displayVal;
+                linhas.forEach(linha => {
+                    if (linha.children[colIndex]) {
+                        linha.children[colIndex].style.display = displayVal;
+                    }
+                });
+            }
+        }
+
+        function calcularSimulacao() {
+            atualizarCamposFilhos(); // <--- Adicione esta linha no início da função
+            const anoInicial = parseInt(document.getElementById('anoInicial').value) || 1;
+            const pontosADE = Math.min(100, Math.max(0, parseFloat(document.getElementById('pontosADE').value) || 0));
+            const avancoTitulacao = parseInt(document.getElementById('avancoTitulacao').value) || 0;
+            const pctInflacao = (parseFloat(document.getElementById('correcaoInflacao').value) || 0) / 100.0;
+            const tetoConstitucional = CONSTANTES.TETO_CONSTITUCIONAL;
+            const regimePrev = document.getElementById('regimePrevidencia').value;
+            const aliquotaPrevcom = (parseFloat(document.getElementById('aliquotaPrevcom').value) || 0) / 100.0;
+            const qtdDependentesIRPF = parseInt(document.getElementById('qtdDependentesIRPF').value) || 0;
+            const nomeFG = document.getElementById('funcaoGratificada').value;
+
+            const filhos = [
+                { tipo: document.getElementById('filho1Tipo').value, idadeInicial: parseInt(document.getElementById('filho1Idade').value) || 0 },
+                { tipo: document.getElementById('filho2Tipo').value, idadeInicial: parseInt(document.getElementById('filho2Idade').value) || 0 },
+                { tipo: document.getElementById('filho3Tipo').value, idadeInicial: parseInt(document.getElementById('filho3Idade').value) || 0 }
+            ];
+
+            const valorFGBase = FUNCOES_GRATIFICADAS[nomeFG] || 0.0;
+            const tbody = document.getElementById('tabelaCorpo');
+            tbody.innerHTML = '';
+
+            const classeCorrigida = (pctInflacao > 0) ? 'valor-corrigido' : '';
+            let alcancouTopo = false;
+
+            // Loop a partir do Ano Inicial selecionado até o 17º Ano
+            for (let ano = anoInicial; ano <= 17; ano++) {
+                if (alcancouTopo) {
+                    break; // Interrompe a renderização após exibir o ano em que o topo TC-94 foi atingido
+                }
+
+                const step = PADROES_BASE_CARREIRA[ano - 1];
+                const padraoEfetivo = Math.min(CONSTANTES.PADRAO_MAXIMO, step.padraoBase + avancoTitulacao);
+
+                if (padraoEfetivo >= CONSTANTES.PADRAO_MAXIMO) {
+                    alcancouTopo = true;
+                }
+
+                const vencimentoOriginal = TABELA_VENCIMENTOS[padraoEfetivo] || 0.0;
+                const vencimentoBase = vencimentoOriginal * (1.0 + pctInflacao);
+                
+                // ADE é pago a partir do 2º ano de carreira (ano > 1)
+                const recebeADE = (ano > 1);
+                const valorADE = recebeADE ? (pontosADE * CONSTANTES.VALOR_PONTO_ADE_NS * (1.0 + pctInflacao)) : 0.0;
+                const valorFG = valorFGBase * (1.0 + pctInflacao);
+
+                const remunSujeitaTeto = vencimentoBase + valorADE + valorFG;
+                const abateTeto = Math.max(0.0, remunSujeitaTeto - tetoConstitucional);
+                const remunEfetivaTributavel = remunSujeitaTeto - abateTeto;
+
+                // Idade da criança evolui a partir do ano inicial visível da simulação (anosPassados = ano - anoInicial)
+                const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
+                const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
+
+                const remunBrutaTotal = remunEfetivaTributavel + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + valorAuxCrecheAno;
+
+                let descPrevidencia = 0.0;
+                if (regimePrev === "ANTIGO_RPPS") {
+                    descPrevidencia = (remunEfetivaTributavel * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS;
+                } else {
+                    descPrevidencia = CONSTANTES.DESCONTO_RPPS_INSS_TETO;
+                }
+
+                let descPrevcom = 0.0;
+                if (regimePrev === "NOVO_PREVCOM" && remunEfetivaTributavel > CONSTANTES.TETO_RGPS) {
+                    descPrevcom = (remunEfetivaTributavel - CONSTANTES.TETO_RGPS) * aliquotaPrevcom;
+                }
+
+                const deducaoDependentesTotal = qtdDependentesIRPF * CONSTANTES.DEDUCAO_DEPENDENTE_IRPF;
+                const baseIRPF = Math.max(0.0, remunEfetivaTributavel - descPrevidencia - descPrevcom - deducaoDependentesTotal);
+                const descIRPF = Math.max(0.0, (baseIRPF * CONSTANTES.ALIQUOTA_MAX_IRPF) - CONSTANTES.PARCELA_DEDUZIR_IRPF);
+
+                //const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto;
+                //const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF);
+
+                // Leitura dos novos parâmetros
+                const eAssociado = document.getElementById('associadoAsscontas').checked;
+                const descAsscontas = eAssociado ? CONSTANTES.MENSALIDADE_ASSCONTAS : 0.0;
+                const descSerpro = eAssociado ? CONSTANTES.TAXA_SERPRO : 0.0;
+                const descOutros = Math.max(0.0, parseFloat(document.getElementById('outrosDescontos').value) || 0.0);
+
+                // Atualiza a informação do valor no card do rodapé
+                document.getElementById('c_outrosDescontos').innerText = formatarMoeda(descOutros);
+
+                // Soma total dos descontos (Previdência + Prevcom + IRPF + Abate-Teto + ASSCONTAS + SERPRO + Outros)
+                const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto + descAsscontas + descSerpro + descOutros;
+
+                // Remuneração Líquida Final (Bruta Total menos os descontos de folha efetivos)
+                const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
+
+                // Renderização das células da tabela (incluindo as 3 novas colunas)
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center font-bold">${ano}º Ano</td>
+                    <td class="text-center font-bold">TC-${padraoEfetivo}</td>
+                    <td class="${classeCorrigida}">${formatarMoeda(vencimentoBase)}</td>
+                    <td class="${classeCorrigida}">${formatarMoeda(valorADE)}</td>
+                    <td class="${classeCorrigida}">${formatarMoeda(valorFG)}</td>
+                    <td class="col-destaque">${formatarMoeda(abateTeto)}</td>
+                    <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
+                    <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
+                    <td>${formatarMoeda(valorAuxCrecheAno)}</td>
+                    <td class="col-destaque">${formatarMoeda(remunBrutaTotal)}</td>
+                    <td>${formatarMoeda(descPrevidencia)}</td>
+                    <td>${formatarMoeda(descPrevcom)}</td>
+                    <td>${formatarMoeda(descIRPF)}</td>
+                    <td>${formatarMoeda(descAsscontas)}</td>
+                    <td>${formatarMoeda(descSerpro)}</td>
+                    <td>${formatarMoeda(descOutros)}</td>
+                    <td class="col-destaque">${formatarMoeda(totalDescontosComAbate)}</td>
+                    <td class="col-liquido">${formatarMoeda(remunLiquida)}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+            // Oculta automaticamente as colunas que estiverem zeradas em todas as linhas
+            ocultarColunasZero();
+            salvarEstado();
+        }
+
+        window.onload = inicializarInterface;
+    </script>
+    <footer style="text-align: center; margin-top: 30px; margin-bottom: 15px; font-size: 0.85em; color: #666;" title="Mas aquele 1% &eacute; vagabundo ;-)">
+        Simulador desenvolvido 99% com o Gemini Notebook
+    </footer>
+</body>
+</html>
