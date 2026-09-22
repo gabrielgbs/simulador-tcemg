@@ -90,6 +90,41 @@
             margin-bottom: 25px;
         }
 
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+        .tab-btn {
+            background: none;
+            border: none;
+            outline: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            width: auto;
+        }
+        .tab-btn:hover {
+            color: var(--primary-color);
+            background-color: #f1f4f9;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -162,106 +197,122 @@
     <div class="subtitle">Base de Cálculo: Lei Estadual nº 25.808/2026</div>
 
     <!-- Painel de Parâmetros -->
+    <!-- Painel de Parâmetros em Abas -->
     <div class="card">
-        <h3>Parâmetros do Servidor</h3>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="anoInicial">Ano Atual na Carreira:</label>
-                <select id="anoInicial" onchange="calcularSimulacao()"></select>
-            </div>
-            <div class="form-group">
-                <label for="pontosADE">Pontos de ADE (0 a 100):</label>
-                <input type="number" id="pontosADE" value="100" min="0" max="100" onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group">
-                <label for="avancoTitulacao">Avanço por Titulação:</label>
-                <select id="avancoTitulacao" onchange="calcularSimulacao()">
-                    <option value="0">Nenhuma (0 padrões)</option>
-                    <option value="1">Mestrado (+1 padrão)</option>
-                    <option value="2">Doutorado (+2 padrões)</option>
-                    <option value="3">Mestrado + Doutorado (+3 padrões)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="correcaoInflacao">Projeção Reajuste (%):</label>
-                <input type="number" id="correcaoInflacao" value="0.0" step="0.5" min="0" onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group">
-                <label for="regimePrevidencia">Regime de Previdência:</label>
-                <select id="regimePrevidencia" onchange="calcularSimulacao()">
-                    <option value="NOVO_PREVCOM">Novo com Prevcom-MG</option>
-                    <option value="NOVO_SEM_PREVCOM">Novo sem Prevcom-MG</option>
-                    <option value="ANTIGO_RPPS">Antigo RPPS (Integral 16%)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="aliquotaPrevcom">Alíquota Prevcom (%):</label>
-                <input type="number" id="aliquotaPrevcom" value="7.5" step="0.5" min="0" max="15" onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group">
-                <label for="qtdDependentesIRPF">Dependentes para IRPF:</label>
-                <input type="number" id="qtdDependentesIRPF" value="0" min="0" onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group">
-                <label for="funcaoGratificada">Função / Cargo Comissionado:</label>
-                <select id="funcaoGratificada" onchange="calcularSimulacao()"></select>
-            </div>
-            <div class="form-group form-group-checkbox">
-                <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
-                <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group form-group-checkbox">
-                <label for="incideAdePrev">ADE incide sobre a previdência?</label>
-                <input type="checkbox" id="incideAdePrev" checked onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group form-group-checkbox">
-                <label for="incideFuncaoPrev">Função incide sobre a previdência?</label>
-                <input type="checkbox" id="incideFuncaoPrev" checked onchange="calcularSimulacao()">
-            </div>
-            <div class="form-group">
-                <label for="outrosDescontos">Outros descontos em folha (R$):</label>
-                <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
-            </div>
+        <div class="tabs-header">
+            <button type="button" class="tab-btn active" onclick="alternarAba(event, 'tab-carreira')">Carreira</button>
+            <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-previdencia')">Previdência</button>
+            <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-adicionais')">Adicionais e Descontos</button>
+        </div>
 
+        <!-- Aba 1: Carreira -->
+        <div id="tab-carreira" class="tab-panel active">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="anoInicial">Ano Atual na Carreira:</label>
+                    <select id="anoInicial" onchange="calcularSimulacao()"></select>
+                </div>
+                <div class="form-group">
+                    <label for="pontosADE">Pontos de ADE (0 a 100):</label>
+                    <input type="number" id="pontosADE" value="100" min="0" max="100" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
+                    <label for="avancoTitulacao">Avanço por Titulação:</label>
+                    <select id="avancoTitulacao" onchange="calcularSimulacao()">
+                        <option value="0">Nenhuma (0 padrões)</option>
+                        <option value="1">Mestrado (+1 padrão)</option>
+                        <option value="2">Doutorado (+2 padrões)</option>
+                        <option value="3">Mestrado + Doutorado (+3 padrões)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="funcaoGratificada">Função / Cargo Comissionado:</label>
+                    <select id="funcaoGratificada" onchange="calcularSimulacao()"></select>
+                </div>
+                <div class="form-group">
+                    <label for="correcaoInflacao">Projeção Reajuste (%):</label>
+                    <input type="number" id="correcaoInflacao" value="0.0" step="0.5" min="0" onchange="calcularSimulacao()">
+                </div>
+            </div>
+        </div>
 
-            <!-- Filhos Individuais (Até 3) -->
-            <div class="form-group">
-                <label for="filho1Tipo">Filho 1 - Tipo Auxílio:</label>
-                <select id="filho1Tipo" onchange="calcularSimulacao()">
-                    <option value="NENHUM">Nenhum</option>
-                    <option value="PADRAO">Padrão (Normal)</option>
-                    <option value="ESPECIAL">Especial (PCD)</option>
-                </select>
+        <!-- Aba 2: Previdência -->
+        <div id="tab-previdencia" class="tab-panel">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="regimePrevidencia">Regime de Previdência:</label>
+                    <select id="regimePrevidencia" onchange="calcularSimulacao()">
+                        <option value="NOVO_PREVCOM">Novo com Prevcom-MG</option>
+                        <option value="NOVO_SEM_PREVCOM">Novo sem Prevcom-MG</option>
+                        <option value="ANTIGO_RPPS">Antigo RPPS (Integral 16%)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="aliquotaPrevcom">Alíquota Prevcom (%):</label>
+                    <input type="number" id="aliquotaPrevcom" value="7.5" step="0.5" min="0" max="15" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group form-group-checkbox">
+                    <label for="incideAdePrev">ADE incide sobre a previdência?</label>
+                    <input type="checkbox" id="incideAdePrev" checked onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group form-group-checkbox">
+                    <label for="incideFuncaoPrev">Função incide sobre a previdência?</label>
+                    <input type="checkbox" id="incideFuncaoPrev" checked onchange="calcularSimulacao()">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="filho1Idade">Filho 1 - Idade:</label>
-                <input type="number" id="filho1Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
-            </div>
+        </div>
 
-            <div class="form-group">
-                <label for="filho2Tipo">Filho 2 - Tipo  Auxílio:</label>
-                <select id="filho2Tipo" onchange="calcularSimulacao()">
-                    <option value="NENHUM">Nenhum</option>
-                    <option value="PADRAO">Padrão (Normal)</option>
-                    <option value="ESPECIAL">Especial (PCD)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="filho2Idade">Filho 2 - Idade:</label>
-                <input type="number" id="filho2Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
-            </div>
-
-            <div class="form-group">
-                <label for="filho3Tipo">Filho 3 - Tipo  Auxílio:</label>
-                <select id="filho3Tipo" onchange="calcularSimulacao()">
-                    <option value="NENHUM">Nenhum</option>
-                    <option value="PADRAO">Padrão (Normal)</option>
-                    <option value="ESPECIAL">Especial (PCD)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="filho3Idade">Filho 3 - Idade:</label>
-                <input type="number" id="filho3Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+        <!-- Aba 3: Adicionais e Descontos -->
+        <div id="tab-adicionais" class="tab-panel">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="qtdDependentesIRPF">Dependentes para IRPF:</label>
+                    <input type="number" id="qtdDependentesIRPF" value="0" min="0" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group form-group-checkbox">
+                    <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
+                    <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
+                    <label for="outrosDescontos">Outros descontos em folha (R$):</label>
+                    <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
+                    <label for="filho1Tipo">Filho 1 - Tipo Auxílio:</label>
+                    <select id="filho1Tipo" onchange="calcularSimulacao()">
+                        <option value="NENHUM">Nenhum</option>
+                        <option value="PADRAO">Padrão (Normal)</option>
+                        <option value="ESPECIAL">Especial (PCD)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filho1Idade">Filho 1 - Idade:</label>
+                    <input type="number" id="filho1Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
+                    <label for="filho2Tipo">Filho 2 - Tipo Auxílio:</label>
+                    <select id="filho2Tipo" onchange="calcularSimulacao()">
+                        <option value="NENHUM">Nenhum</option>
+                        <option value="PADRAO">Padrão (Normal)</option>
+                        <option value="ESPECIAL">Especial (PCD)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filho2Idade">Filho 2 - Idade:</label>
+                    <input type="number" id="filho2Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
+                    <label for="filho3Tipo">Filho 3 - Tipo Auxílio:</label>
+                    <select id="filho3Tipo" onchange="calcularSimulacao()">
+                        <option value="NENHUM">Nenhum</option>
+                        <option value="PADRAO">Padrão (Normal)</option>
+                        <option value="ESPECIAL">Especial (PCD)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filho3Idade">Filho 3 - Idade:</label>
+                    <input type="number" id="filho3Idade" value="0" min="0" max="7" onchange="calcularSimulacao()">
+                </div>
             </div>
         </div>
     </div>
@@ -401,6 +452,18 @@
                                         { ano: 17, padraoBase: 94 } 
                                     ];
 
+        function alternarAba(event, idAba) {
+            document.querySelectorAll('.tab-panel').forEach(painel => {
+                painel.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(botao => {
+                botao.classList.remove('active');
+            });
+
+            document.getElementById(idAba).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
         function formatarMoeda(valor) {
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
