@@ -234,9 +234,16 @@
     </style>
 </head>
 <body>
-
     <h1>Simulador de Carreira - Auditor de Controle Externo (TCE-MG)</h1>
-    <div class="subtitle">Base de Cálculo: Lei Estadual nº 25.808/2026</div>
+    <div class="subtitle">
+        Base de Cálculo: Lei Estadual nº 25.808/2026 | 
+        <a href="https://www.tce.mg.gov.br/IMG/PrestaContas/Transparencia/2026/tabela-de-vencimentos-01012026.pdf" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           style="color: var(--primary-color); text-decoration: underline;">
+            Consultar Tabela de Vencimentos Oficial (PDF)
+        </a>
+    </div>
 
     <!-- Painel de Parâmetros -->
     <!-- Painel de Parâmetros em Abas -->
@@ -407,8 +414,6 @@
             <div class="constante-item"><span>Taxa Desconto em Folha (SERPRO):</span><strong id="c_serpro"></strong></div>
         </div>
     </div>
-    <a style="display: block; text-align: center; margin-top: 20px;" href="https://www.tce.mg.gov.br/IMG/PrestaContas/Transparencia/2026/tabela-de-vencimentos-01012026.pdf" target="_blank">Tabela de padrão remuneratório (via Portal da Transparência do TCE-MG)</a>
-
     <script>
         const CHAVE_STORAGE = "simulador_tcemg_estado_v6";
 
@@ -808,6 +813,12 @@
     <footer style="text-align: center; margin-top: 30px; margin-bottom: 15px; font-size: 0.85em; color: #666;">
         <p>
             Código iniciado com apoio do <strong>Gemini Notebook</strong> e refinado, revisado e mantido por humanos.
+        </p>
+        <p>
+            Gostou da ferramenta ou quer sugerir melhorias? 
+            <a href="https://github.com/gabrielgbs/simulador-tcemg" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">
+                Acompanhe e contribua com o projeto no GitHub 🚀
+            </a>
         </p>
     </footer>
 </body>
