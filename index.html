@@ -210,6 +210,14 @@
                 <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
                 <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
             </div>
+            <div class="form-group form-group-checkbox">
+                <label for="incideAdePrev">ADE incide sobre a previdência?</label>
+                <input type="checkbox" id="incideAdePrev" checked onchange="calcularSimulacao()">
+            </div>
+            <div class="form-group form-group-checkbox">
+                <label for="incideFuncaoPrev">Função incide sobre a previdência?</label>
+                <input type="checkbox" id="incideFuncaoPrev" checked onchange="calcularSimulacao()">
+            </div>
             <div class="form-group">
                 <label for="outrosDescontos">Outros descontos em folha (R$):</label>
                 <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
@@ -414,6 +422,8 @@
                 filho3Tipo: document.getElementById('filho3Tipo').value,
                 filho3Idade: document.getElementById('filho3Idade').value,
                 associadoAsscontas: document.getElementById('associadoAsscontas').checked,
+                incideAdePrev: document.getElementById('incideAdePrev').checked,
+                incideFuncaoPrev: document.getElementById('incideFuncaoPrev').checked,
                 outrosDescontos: document.getElementById('outrosDescontos').value
             };
             try {
@@ -443,6 +453,8 @@
                     if (estado.filho3Tipo !== undefined) document.getElementById('filho3Tipo').value = estado.filho3Tipo;
                     if (estado.filho3Idade !== undefined) document.getElementById('filho3Idade').value = estado.filho3Idade;
                     if (estado.associadoAsscontas !== undefined) document.getElementById('associadoAsscontas').checked = estado.associadoAsscontas;
+                    if (estado.incideAdePrev !== undefined) document.getElementById('incideAdePrev').checked = estado.incideAdePrev;
+                    if (estado.incideFuncaoPrev !== undefined) document.getElementById('incideFuncaoPrev').checked = estado.incideFuncaoPrev;
                     if (estado.outrosDescontos !== undefined) document.getElementById('outrosDescontos').value = estado.outrosDescontos;
                 }
             } catch (e) {
@@ -560,7 +572,7 @@
         }
 
         function calcularSimulacao() {
-            atualizarCamposFilhos(); // <--- Adicione esta linha no início da função
+            atualizarCamposFilhos();
             const anoInicial = parseInt(document.getElementById('anoInicial').value) || 1;
             const pontosADE = Math.min(100, Math.max(0, parseFloat(document.getElementById('pontosADE').value) || 0));
             const avancoTitulacao = parseInt(document.getElementById('avancoTitulacao').value) || 0;
@@ -569,6 +581,8 @@
             const regimePrev = document.getElementById('regimePrevidencia').value;
             const aliquotaPrevcom = (parseFloat(document.getElementById('aliquotaPrevcom').value) || 0) / 100.0;
             const qtdDependentesIRPF = parseInt(document.getElementById('qtdDependentesIRPF').value) || 0;
+            const incideAdePrev = document.getElementById('incideAdePrev').checked;
+            const incideFuncaoPrev = document.getElementById('incideFuncaoPrev').checked;
             const nomeFG = document.getElementById('funcaoGratificada').value;
 
             const filhos = [
@@ -604,27 +618,36 @@
                 const recebeADE = (ano > 1);
                 const valorADE = recebeADE ? (pontosADE * CONSTANTES.VALOR_PONTO_ADE_NS * (1.0 + pctInflacao)) : 0.0;
                 const valorFG = valorFGBase * (1.0 + pctInflacao);
-
                 const remunSujeitaTeto = vencimentoBase + valorADE + valorFG;
                 const abateTeto = Math.max(0.0, remunSujeitaTeto - tetoConstitucional);
                 const remunEfetivaTributavel = remunSujeitaTeto - abateTeto;
 
-                // Idade da criança evolui a partir do ano inicial visível da simulação (anosPassados = ano - anoInicial)
+                // Cálculo da base de cálculo previdenciária conforme os checkboxes
+                const fatorTeto = remunSujeitaTeto > 0 ? (remunEfetivaTributavel / remunSujeitaTeto) : 1;
+                let basePrevidencia = vencimentoBase * fatorTeto;
+                if (incideAdePrev) basePrevidencia += (valorADE * fatorTeto);
+                if (incideFuncaoPrev) basePrevidencia += (valorFG * fatorTeto);
+
+                // Idade da criança evolui a partir do ano inicial visível da simulação
                 const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
                 const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
-
                 const remunBrutaTotal = remunEfetivaTributavel + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + valorAuxCrecheAno;
 
                 let descPrevidencia = 0.0;
                 if (regimePrev === "ANTIGO_RPPS") {
-                    descPrevidencia = (remunEfetivaTributavel * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS;
+                    descPrevidencia = Math.max(0.0, (basePrevidencia * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS);
                 } else {
-                    descPrevidencia = CONSTANTES.DESCONTO_RPPS_INSS_TETO;
+                    // Novo regime: desconta o teto do RGPS ou a alíquota sobre a base se esta for inferior ao teto
+                    if (basePrevidencia >= CONSTANTES.TETO_RGPS) {
+                        descPrevidencia = CONSTANTES.DESCONTO_RPPS_INSS_TETO;
+                    } else {
+                        descPrevidencia = Math.max(0.0, (basePrevidencia * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS);
+                    }
                 }
 
                 let descPrevcom = 0.0;
-                if (regimePrev === "NOVO_PREVCOM" && remunEfetivaTributavel > CONSTANTES.TETO_RGPS) {
-                    descPrevcom = (remunEfetivaTributavel - CONSTANTES.TETO_RGPS) * aliquotaPrevcom;
+                if (regimePrev === "NOVO_PREVCOM" && basePrevidencia > CONSTANTES.TETO_RGPS) {
+                    descPrevcom = (basePrevidencia - CONSTANTES.TETO_RGPS) * aliquotaPrevcom;
                 }
 
                 const deducaoDependentesTotal = qtdDependentesIRPF * CONSTANTES.DEDUCAO_DEPENDENTE_IRPF;
