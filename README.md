@@ -20,7 +20,6 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 - Férias
 - 13º
 - Variações no desconto da ASSCONTAS
-- Carreira de Oficial de Controle Externo
 
 Caso você queira adicionar esses recursos, fico feliz em receber seu pull-request 😁
 
@@ -35,6 +34,14 @@ Caso você queira adicionar esses recursos, fico feliz em receber seu pull-reque
 2. Ajuste os parâmetros no formulário.
 3. Consulte a tabela com a simulação por ano.
 4. Revise os valores de remuneração bruta, descontos e líquida final.
+
+## Trabalhos futuros (Não necessariamente nessa ordem)
+
+- Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
+- Carreira de Oficial de Controle Externo
+- Desconto do AudTCE-MG
+- Férias
+- 13º
 
 ## Observações
 
