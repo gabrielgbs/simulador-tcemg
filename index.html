@@ -10,11 +10,40 @@
             --secondary-color: #4472c4;
             --bg-light: #f8f9fa;
             --border-color: #d9d9d9;
+            --card-bg: #ffffff;
             --input-bg: #dce6f1;
             --output-bg: #e2efda;
-            --text-color: #333;
+            --text-color: #333333;
+            --text-muted: #666666;
             --blue-highlight: #004085;
             --blue-highlight-bg: #e8f4f8;
+            --table-row-even: #f9fbfd;
+            --table-border: #d9d9d9;
+            --color-liquido-text: #1e4620;
+            --disabled-bg: #e0e0e0;
+            --disabled-color: #888888;
+            --table-row-hover: #eaf1fb;
+        }
+
+        /* Variáveis do Tema Escuro */
+        [data-theme="dark"] {
+            --primary-color: #5c8ae6;
+            --secondary-color: #7097d1;
+            --bg-light: #121214;
+            --border-color: #32363e;
+            --card-bg: #1e1e24;
+            --input-bg: #2a2e39;
+            --output-bg: #1c3822;
+            --text-color: #e1e4ea;
+            --text-muted: #9aa0a6;
+            --blue-highlight: #8ab4f8;
+            --blue-highlight-bg: #18283e;
+            --table-row-even: #191b20;
+            --table-border: #2c3038;
+            --color-liquido-text: #69db7c;
+            --disabled-bg: #2d3039;
+            --disabled-color: #6c7280;
+            --table-row-hover: #262c38;
         }
 
         body {
@@ -22,21 +51,53 @@
             margin: 20px;
             background-color: var(--bg-light);
             color: var(--text-color);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        /* Cabeçalho Superior e Alternador de Tema */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 10px;
         }
 
         h1 {
             color: var(--primary-color);
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
         }
 
         .subtitle {
             font-size: 0.9em;
-            color: #666;
+            color: var(--text-muted);
             margin-bottom: 20px;
         }
 
+        .theme-toggle-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            width: auto;
+            white-space: nowrap;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        /* Cartões e Contêineres */
         .card {
-            background: #fff;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -51,6 +112,53 @@
             color: var(--primary-color);
         }
 
+        /* Abas de Navegação */
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            gap: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            outline: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            width: auto;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+            background-color: var(--input-bg);
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Formulários e Entradas */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -63,8 +171,10 @@
             align-items: center;
         }
 
-        .form-group-checkbox input[type="checkbox"] { 
-            width: 20px; height: 20px; cursor: pointer; 
+        .form-group-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
         }
 
         label {
@@ -75,60 +185,31 @@
         input, select {
             padding: 6px 10px;
             border-radius: 4px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border-color);
             font-size: 0.92em;
             background-color: var(--input-bg);
+            color: var(--text-color);
             width: 100%;
             max-width: 200px;
             box-sizing: border-box;
         }
 
+        input:disabled, select:disabled {
+            background-color: var(--disabled-bg) !important;
+            color: var(--disabled-color);
+            cursor: not-allowed;
+            opacity: 0.6;
+            border-color: var(--border-color);
+        }
+
+        /* Tabela de Resultados */
         .table-container {
             overflow-x: auto;
-            background: #fff;
+            background: var(--card-bg);
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid var(--border-color);
             margin-bottom: 25px;
-        }
-
-        .tabs-header {
-            display: flex;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 20px;
-            gap: 5px;
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-        .tab-btn {
-            background: none;
-            border: none;
-            outline: none;
-            padding: 10px 14px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: 600;
-            color: #666;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .tab-btn:hover {
-            color: var(--primary-color);
-            background-color: #f1f4f9;
-            border-radius: 4px 4px 0 0;
-        }
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-        .tab-panel {
-            display: none;
-        }
-        .tab-panel.active {
-            display: block;
         }
 
         table {
@@ -140,7 +221,7 @@
 
         th {
             background-color: var(--primary-color);
-            color: white;
+            color: #ffffff;
             padding: 10px 6px;
             font-weight: 600;
             text-align: center;
@@ -148,19 +229,27 @@
 
         td {
             padding: 8px 6px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--table-border);
         }
 
         tr:nth-child(even) {
-            background-color: #f9fbfd;
+            background-color: var(--table-row-even);
         }
 
-        input:disabled, select:disabled { 
-            background-color: #e0e0e0 !important; 
-            color: #888888; 
-            cursor: not-allowed; 
-            opacity: 0.5; 
-            border-color: #ccc; 
+        tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background-color: var(--table-row-hover) !important;
+        }
+
+        tbody tr:hover td.col-liquido {
+            filter: brightness(0.96);
+        }
+
+        [data-theme="dark"] tbody tr:hover td.col-liquido {
+            filter: brightness(1.15);
         }
 
         .col-destaque {
@@ -170,7 +259,7 @@
         .col-liquido {
             background-color: var(--output-bg) !important;
             font-weight: bold;
-            color: #1e4620;
+            color: var(--color-liquido-text) !important;
         }
 
         .valor-corrigido {
@@ -179,6 +268,7 @@
             background-color: var(--blue-highlight-bg) !important;
         }
 
+        /* Constantes Legais */
         .constantes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -190,42 +280,55 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 0;
-            border-bottom: 1px dashed #eee;
+            border-bottom: 1px dashed var(--border-color);
         }
 
         .text-center { text-align: center; }
         .text-left { text-align: left; }
 
-        /* Responsividade para Telas Menores / Celulares */
+        /* Responsividade para Dispositivos Móveis */
         @media (max-width: 600px) {
             body {
                 margin: 10px;
             }
+
+            .header-top {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
             .card {
                 padding: 15px;
             }
+
             .form-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
             }
+
             .form-group {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 6px;
             }
+
             .form-group label {
                 width: 100%;
             }
+
             .form-group input, 
             .form-group select {
                 max-width: 100%;
                 width: 100%;
             }
+
             .form-group-checkbox {
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
             }
+
             .form-group-checkbox input[type="checkbox"] {
                 width: 22px;
                 height: 22px;
@@ -234,15 +337,22 @@
     </style>
 </head>
 <body>
-    <h1>Simulador de Carreira - Auditor de Controle Externo (TCE-MG)</h1>
-    <div class="subtitle">
-        Base de Cálculo: Lei Estadual nº 25.808/2026 | 
-        <a href="https://www.tce.mg.gov.br/IMG/PrestaContas/Transparencia/2026/tabela-de-vencimentos-01012026.pdf" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           style="color: var(--primary-color); text-decoration: underline;">
-            Consultar Tabela de Vencimentos Oficial (PDF)
-        </a>
+    <div class="header-top">
+        <div>
+            <h1>Simulador de Carreira - Auditor de Controle Externo (TCE-MG)</h1>
+            <div class="subtitle">
+                Base de Cálculo: Lei Estadual nº 25.808/2026 · 
+                <a href="https://www.tce.mg.gov.br/IMG/PrestaContas/Transparencia/2026/tabela-de-vencimentos-01012026.pdf" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   style="color: var(--primary-color); text-decoration: underline;">
+                    Tabela de Vencimentos Oficial (PDF)
+                </a>
+            </div>
+        </div>
+        <button id="themeToggleBtn" class="theme-toggle-btn" type="button" onclick="alternarTemaManual()">
+            <span id="themeIcon">🌓</span> <span id="themeLabel">Tema</span>
+        </button>
     </div>
 
     <!-- Painel de Parâmetros -->
@@ -416,6 +526,52 @@
     </div>
     <script>
         const CHAVE_STORAGE = "simulador_tcemg_estado_v6";
+        const CHAVE_STORAGE_TEMA = "simulador_tcemg_tema";
+
+        // Aplica o tema imediatamente antes de renderizar a página
+        function aplicarTemaInicial() {
+            const salvo = localStorage.getItem(CHAVE_STORAGE_TEMA);
+            if (salvo === "dark" || salvo === "light") {
+                document.documentElement.setAttribute('data-theme', salvo);
+            } else {
+                // Sincroniza com a preferência do dispositivo
+                const prefereEscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefereEscuro ? 'dark' : 'light');
+            }
+        }
+        aplicarTemaInicial();
+
+        // Ouve mudanças automáticas no sistema caso o usuário não tenha forçado uma escolha manual
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem(CHAVE_STORAGE_TEMA)) {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                atualizarBotaoTema();
+            }
+        });
+
+        function atualizarBotaoTema() {
+            const temaAtual = document.documentElement.getAttribute('data-theme');
+            const icon = document.getElementById('themeIcon');
+            const label = document.getElementById('themeLabel');
+            if (!icon || !label) return;
+
+            if (temaAtual === 'dark') {
+                icon.innerText = '☀️';
+                label.innerText = 'Modo Claro';
+            } else {
+                icon.innerText = '🌙';
+                label.innerText = 'Modo Escuro';
+            }
+        }
+
+        function alternarTemaManual() {
+            const temaAtual = document.documentElement.getAttribute('data-theme');
+            const novoTema = (temaAtual === 'dark') ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', novoTema);
+            localStorage.setItem(CHAVE_STORAGE_TEMA, novoTema);
+            atualizarBotaoTema();
+        }
 
         const CONSTANTES = {
             PADRAO_MAXIMO: 94,
@@ -610,6 +766,7 @@
 
             carregarEstado();
             calcularSimulacao();
+            atualizarBotaoTema();
         }
 
         function calcularAuxilioCrecheAno(filhos, anoSimulacao) {
