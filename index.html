@@ -467,6 +467,10 @@
                     <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
                 </div>
                 <div class="form-group">
+                    <label for="outrasVerbasIndenizatorias">Outras verbas indenizatórias (R$):</label>
+                    <input type="number" id="outrasVerbasIndenizatorias" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group">
                     <label for="outrosDescontos">Outros descontos em folha (R$):</label>
                     <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
@@ -522,6 +526,7 @@
                     <th>Função Grat.</th>
                     <th>Aux. Alimentação</th>
                     <th>Aux. Saúde</th>
+                    <th>Outras verbas indenizatórias</th>
                     <th>Aux. Creche</th>
                     <th>Remuneração Bruta Total</th>
                     <th>Abate-Teto</th>
@@ -709,6 +714,7 @@
                 aliquotaPrevcom: document.getElementById('aliquotaPrevcom').value,
                 qtdDependentesIRPF: document.getElementById('qtdDependentesIRPF').value,
                 funcaoGratificada: document.getElementById('funcaoGratificada').value,
+                outrasVerbasIndenizatorias: document.getElementById('outrasVerbasIndenizatorias').value,
                 filho1Tipo: document.getElementById('filho1Tipo').value,
                 filho1Idade: document.getElementById('filho1Idade').value,
                 filho2Tipo: document.getElementById('filho2Tipo').value,
@@ -740,6 +746,7 @@
                     if (estado.aliquotaPrevcom !== undefined) document.getElementById('aliquotaPrevcom').value = estado.aliquotaPrevcom;
                     if (estado.qtdDependentesIRPF !== undefined) document.getElementById('qtdDependentesIRPF').value = estado.qtdDependentesIRPF;
                     if (estado.funcaoGratificada !== undefined) document.getElementById('funcaoGratificada').value = estado.funcaoGratificada;
+                    if (estado.outrasVerbasIndenizatorias !== undefined) document.getElementById('outrasVerbasIndenizatorias').value = estado.outrasVerbasIndenizatorias;
                     if (estado.filho1Tipo !== undefined) document.getElementById('filho1Tipo').value = estado.filho1Tipo;
                     if (estado.filho1Idade !== undefined) document.getElementById('filho1Idade').value = estado.filho1Idade;
                     if (estado.filho2Tipo !== undefined) document.getElementById('filho2Tipo').value = estado.filho2Tipo;
@@ -876,6 +883,7 @@
             const regimePrev = document.getElementById('regimePrevidencia').value;
             const aliquotaPrevcom = (parseFloat(document.getElementById('aliquotaPrevcom').value) || 0) / 100.0;
             const qtdDependentesIRPF = parseInt(document.getElementById('qtdDependentesIRPF').value) || 0;
+            const outrasVerbasIndenizatorias = Math.max(0.0, parseFloat(document.getElementById('outrasVerbasIndenizatorias').value) || 0.0);
             const incideAdePrev = document.getElementById('incideAdePrev').checked;
             const incideFuncaoPrev = document.getElementById('incideFuncaoPrev').checked;
             const nomeFG = document.getElementById('funcaoGratificada').value;
@@ -926,7 +934,7 @@
                 // Idade da criança evolui a partir do ano inicial visível da simulação
                 const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
                 const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
-                const remunBrutaTotal = remunEfetivaTributavel + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + valorAuxCrecheAno;
+                const remunBrutaTotal = remunEfetivaTributavel + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno;
 
                 let descPrevidencia = 0.0;
                 if (regimePrev === "ANTIGO_RPPS") {
@@ -974,6 +982,7 @@
                     <td class="${classeCorrigida}">${formatarMoeda(valorFG)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
+                    <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
                     <td>${formatarMoeda(valorAuxCrecheAno)}</td>
                     <td class="col-destaque">${formatarMoeda(remunBrutaTotal)}</td>
                     <td class="col-destaque">${formatarMoeda(abateTeto)}</td>
