@@ -467,6 +467,14 @@
                     <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
                 </div>
                 <div class="form-group">
+                    <label for="decimoTerceiroSalario">13º Salário:</label>
+                    <select id="decimoTerceiroSalario" onchange="calcularSimulacao()">
+                        <option value="NAO">Não</option>
+                        <option value="PRIMEIRA">1ª Parcela</option>
+                        <option value="SEGUNDA">2ª Parcela</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="outrasVerbasIndenizatorias">Outras verbas indenizatórias (R$):</label>
                     <input type="number" id="outrasVerbasIndenizatorias" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
@@ -524,6 +532,7 @@
                     <th>Vencimento Base</th>
                     <th>ADE</th>
                     <th>Função Grat.</th>
+                    <th>13º Salário</th>
                     <th>Aux. Alimentação</th>
                     <th>Aux. Saúde</th>
                     <th>Outras verbas indenizatórias</th>
@@ -714,6 +723,7 @@
                 aliquotaPrevcom: document.getElementById('aliquotaPrevcom').value,
                 qtdDependentesIRPF: document.getElementById('qtdDependentesIRPF').value,
                 funcaoGratificada: document.getElementById('funcaoGratificada').value,
+                decimoTerceiroSalario: document.getElementById('decimoTerceiroSalario').value,
                 outrasVerbasIndenizatorias: document.getElementById('outrasVerbasIndenizatorias').value,
                 filho1Tipo: document.getElementById('filho1Tipo').value,
                 filho1Idade: document.getElementById('filho1Idade').value,
@@ -746,6 +756,7 @@
                     if (estado.aliquotaPrevcom !== undefined) document.getElementById('aliquotaPrevcom').value = estado.aliquotaPrevcom;
                     if (estado.qtdDependentesIRPF !== undefined) document.getElementById('qtdDependentesIRPF').value = estado.qtdDependentesIRPF;
                     if (estado.funcaoGratificada !== undefined) document.getElementById('funcaoGratificada').value = estado.funcaoGratificada;
+                    if (estado.decimoTerceiroSalario !== undefined) document.getElementById('decimoTerceiroSalario').value = estado.decimoTerceiroSalario;
                     if (estado.outrasVerbasIndenizatorias !== undefined) document.getElementById('outrasVerbasIndenizatorias').value = estado.outrasVerbasIndenizatorias;
                     if (estado.filho1Tipo !== undefined) document.getElementById('filho1Tipo').value = estado.filho1Tipo;
                     if (estado.filho1Idade !== undefined) document.getElementById('filho1Idade').value = estado.filho1Idade;
@@ -883,6 +894,7 @@
             const regimePrev = document.getElementById('regimePrevidencia').value;
             const aliquotaPrevcom = (parseFloat(document.getElementById('aliquotaPrevcom').value) || 0) / 100.0;
             const qtdDependentesIRPF = parseInt(document.getElementById('qtdDependentesIRPF').value) || 0;
+            const opcaoDecimoTerceiro = document.getElementById('decimoTerceiroSalario').value || 'NAO';
             const outrasVerbasIndenizatorias = Math.max(0.0, parseFloat(document.getElementById('outrasVerbasIndenizatorias').value) || 0.0);
             const incideAdePrev = document.getElementById('incideAdePrev').checked;
             const incideFuncaoPrev = document.getElementById('incideFuncaoPrev').checked;
@@ -957,10 +969,17 @@
                 const baseIRPF = Math.max(0.0, remunEfetivaTributavel - descPrevidencia - descPrevcom - deducaoDependentesTotal);
                 const descIRPF = Math.max(0.0, (baseIRPF * CONSTANTES.ALIQUOTA_MAX_IRPF) - CONSTANTES.PARCELA_DEDUZIR_IRPF);
 
-                //const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto;
-                //const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF);
+                const valorBaseDecimo = Math.max(0.0, vencimentoBase + valorADE + valorFG);
+                const primeiraParcelaDecimo = valorBaseDecimo / 2.0;
+                const segundaParcelaDecimo = Math.max(0.0, valorBaseDecimo - descPrevidencia - descPrevcom - descIRPF - primeiraParcelaDecimo);
 
-                // Leitura dos novos parâmetros
+                let valorDecimoSalario = 0.0;
+                if (opcaoDecimoTerceiro === 'PRIMEIRA') {
+                    valorDecimoSalario = primeiraParcelaDecimo;
+                } else if (opcaoDecimoTerceiro === 'SEGUNDA') {
+                    valorDecimoSalario = segundaParcelaDecimo;
+                }
+
                 const eAssociado = document.getElementById('associadoAsscontas').checked;
                 const descAsscontas = eAssociado ? CONSTANTES.MENSALIDADE_ASSCONTAS : 0.0;
                 const descSerpro = eAssociado ? CONSTANTES.TAXA_SERPRO : 0.0;
@@ -969,8 +988,8 @@
                 // Soma total dos descontos (Previdência + Prevcom + IRPF + Abate-Teto + ASSCONTAS + SERPRO + Outros)
                 const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto + descAsscontas + descSerpro + descOutros;
 
-                // Remuneração Líquida Final (Bruta Total menos os descontos de folha efetivos)
-                const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
+                // Remuneração Líquida Final (bruta total + valor do 13º salário, menos os descontos de folha efetivos)
+                const remunLiquida = remunBrutaTotal + valorDecimoSalario - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
 
                 // Renderização das células da tabela (incluindo as 3 novas colunas)
                 let tr = document.createElement('tr');
@@ -980,6 +999,7 @@
                     <td class="${classeCorrigida}">${formatarMoeda(vencimentoBase)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorADE)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorFG)}</td>
+                    <td>${formatarMoeda(valorDecimoSalario)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
                     <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
