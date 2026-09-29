@@ -536,7 +536,7 @@
                     <th>Aux. Saúde</th>
                     <th>Outras verbas indenizatórias</th>
                     <th>Aux. Creche</th>
-                    <th>Remuneração Bruta Total</th>
+                    <th>Remuneração Bruta</th>
                     <th>Abate-Teto</th>
                     <th>Desc. Previdência</th>
                     <th>Desc. Prevcom</th>
@@ -960,7 +960,7 @@
                 // Idade da criança evolui a partir do ano inicial visível da simulação
                 const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
                 const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
-                const remunBrutaTotal = remunEfetivaTributavel + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno;
+                const remunBrutaTotal = vencimentoBase + valorADE + valorFG + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno;
 
                 let descPrevidencia = 0.0;
                 if (regimePrev === "ANTIGO_RPPS") {
@@ -983,9 +983,9 @@
                 const baseIRPF = Math.max(0.0, remunEfetivaTributavel - descPrevidencia - descPrevcom - deducaoDependentesTotal);
                 const descIRPF = Math.max(0.0, (baseIRPF * CONSTANTES.ALIQUOTA_MAX_IRPF) - CONSTANTES.PARCELA_DEDUZIR_IRPF);
 
-                const valorBaseDecimo = Math.max(0.0, vencimentoBase + valorADE + valorFG);
+                const valorBaseDecimo = remunSujeitaTeto;
                 const primeiraParcelaDecimo = valorBaseDecimo / 2.0;
-                const segundaParcelaDecimo = Math.max(0.0, valorBaseDecimo - descPrevidencia - descPrevcom - descIRPF - primeiraParcelaDecimo);
+                const segundaParcelaDecimo = Math.max(0.0, valorBaseDecimo - abateTeto - descPrevidencia - descPrevcom - descIRPF - primeiraParcelaDecimo);
 
                 let valorDecimoSalario = 0.0;
                 if (opcaoDecimoTerceiro === 'PRIMEIRA') {
@@ -1003,7 +1003,7 @@
                 const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto + descAsscontas + descSerpro + descOutros;
 
                 // Remuneração Líquida Final (bruta total menos os descontos de folha efetivos)
-                const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
+                const remunLiquida = remunBrutaTotal - totalDescontosComAbate;
                 const somaRemuneracaoLiquida = remunLiquida + valorDecimoSalario;
 
                 // Renderização das células da tabela (incluindo as colunas do 13º e da soma final)
