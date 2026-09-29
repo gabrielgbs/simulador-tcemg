@@ -1037,6 +1037,19 @@
             ocultarColunasZero();
             salvarEstado();
         }
+        (function registrarHit() {
+            const host = window.location.hostname;
+            const isDev = host === "localhost" || host === "127.0.0.1" || window.location.protocol === "file:";
+
+            // Se for ambiente de desenvolvimento/teste, não registra nada
+            if (isDev) {
+                console.log("[Analytics] Ambiente de teste detectado: hit ignorado.");
+                return;
+            }
+
+            const pixel = new Image();
+            pixel.src = "https://hitscounter.dev/api/hit?url=https%3A%2F%2Fgabrielgbs.github.io%2Fsimulador-tcemg%2F&label=Visitas&icon=suit-heart-fill&color=%230d6efd&message=&style=flat&tz=UTC";
+        })();
 
         window.onload = inicializarInterface;
     </script>
