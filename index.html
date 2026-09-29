@@ -532,7 +532,6 @@
                     <th>Vencimento Base</th>
                     <th>ADE</th>
                     <th>Função Grat.</th>
-                    <th>13º Salário</th>
                     <th>Aux. Alimentação</th>
                     <th>Aux. Saúde</th>
                     <th>Outras verbas indenizatórias</th>
@@ -546,7 +545,9 @@
                     <th>Taxa desconto em folha (SERPRO)</th>
                     <th>Outros descontos</th>
                     <th>Total Descontos</th>
-                    <th>Remuneração Líquida Final</th>
+                    <th>Remuneração Líquida</th>
+                    <th>13º Salário (Líq.)</th>
+                    <th>Soma Rem. Líq.</th>
                 </tr>
             </thead>
             <tbody id="tabelaCorpo"></tbody>
@@ -856,9 +857,22 @@
             if (linhas.length === 0) return;
 
             const numColunas = headers.length;
+            const opcaoDecimoTerceiro = document.getElementById('decimoTerceiroSalario').value || 'NAO';
+            const indiceColunaSoma = Array.from(headers).findIndex(th => th.textContent.includes('Soma Rem. Líq.'));
 
             for (let colIndex = 0; colIndex < numColunas; colIndex++) {
                 let todosZero = true;
+
+                if (colIndex === indiceColunaSoma && opcaoDecimoTerceiro === 'NAO') {
+                    const displayVal = 'none';
+                    headers[colIndex].style.display = displayVal;
+                    linhas.forEach(linha => {
+                        if (linha.children[colIndex]) {
+                            linha.children[colIndex].style.display = displayVal;
+                        }
+                    });
+                    continue;
+                }
 
                 linhas.forEach(linha => {
                     const celula = linha.children[colIndex];
@@ -988,10 +1002,11 @@
                 // Soma total dos descontos (Previdência + Prevcom + IRPF + Abate-Teto + ASSCONTAS + SERPRO + Outros)
                 const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto + descAsscontas + descSerpro + descOutros;
 
-                // Remuneração Líquida Final (bruta total + valor do 13º salário, menos os descontos de folha efetivos)
-                const remunLiquida = remunBrutaTotal + valorDecimoSalario - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
+                // Remuneração Líquida Final (bruta total menos os descontos de folha efetivos)
+                const remunLiquida = remunBrutaTotal - (descPrevidencia + descPrevcom + descIRPF + descAsscontas + descSerpro + descOutros);
+                const somaRemuneracaoLiquida = remunLiquida + valorDecimoSalario;
 
-                // Renderização das células da tabela (incluindo as 3 novas colunas)
+                // Renderização das células da tabela (incluindo as colunas do 13º e da soma final)
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="text-center font-bold">${ano}º Ano</td>
@@ -999,7 +1014,6 @@
                     <td class="${classeCorrigida}">${formatarMoeda(vencimentoBase)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorADE)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorFG)}</td>
-                    <td>${formatarMoeda(valorDecimoSalario)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
                     <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
@@ -1014,6 +1028,8 @@
                     <td>${formatarMoeda(descOutros)}</td>
                     <td class="col-destaque">${formatarMoeda(totalDescontosComAbate)}</td>
                     <td class="col-liquido">${formatarMoeda(remunLiquida)}</td>
+                    <td>${formatarMoeda(valorDecimoSalario)}</td>
+                    <td class="col-liquido">${formatarMoeda(somaRemuneracaoLiquida)}</td>
                 `;
                 tbody.appendChild(tr);
             }
