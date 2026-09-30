@@ -186,10 +186,27 @@
             align-items: center;
         }
 
-        .form-group-checkbox input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+        .form-group-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
             cursor: pointer;
+        }
+
+        .form-group-checkbox label {
+            order: 2;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .form-group-checkbox input[type="checkbox"] {
+            order: 1;
+            margin: 0;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
         }
 
         label {
@@ -545,7 +562,7 @@
                     <th>Taxa desconto em folha (SERPRO)</th>
                     <th>Outros descontos</th>
                     <th>Total Descontos</th>
-                    <th>Remuneração Líquida</th>
+                    <th id="header-remuneracao-liquida">Remuneração Líquida</th>
                     <th>13º Salário (Líq.)</th>
                     <th>Soma Rem. Líq.</th>
                 </tr>
@@ -858,7 +875,17 @@
 
             const numColunas = headers.length;
             const opcaoDecimoTerceiro = document.getElementById('decimoTerceiroSalario').value || 'NAO';
+            const headerRemuneracaoLiquida = document.getElementById('header-remuneracao-liquida');
+            const indiceColunaRemuneracaoLiquida = headerRemuneracaoLiquida ? Array.from(headers).indexOf(headerRemuneracaoLiquida) : -1;
             const indiceColunaSoma = Array.from(headers).findIndex(th => th.textContent.includes('Soma Rem. Líq.'));
+
+            if (headerRemuneracaoLiquida) {
+                if (opcaoDecimoTerceiro !== 'NAO') {
+                    headerRemuneracaoLiquida.textContent = 'Remuneração Líq. do Mês';
+                } else {
+                    headerRemuneracaoLiquida.textContent = 'Remuneração Líquida';
+                }
+            }
 
             for (let colIndex = 0; colIndex < numColunas; colIndex++) {
                 let todosZero = true;
@@ -878,7 +905,6 @@
                     const celula = linha.children[colIndex];
                     if (celula) {
                         const texto = celula.innerText.trim();
-                        // Extrai o valor numérico (ex: "R$ 0,00" -> 0, "R$ 1.200,00" -> 1200)
                         const valorNumerico = parseFloat(texto.replace(/[^\d,-]/g, '').replace(',', '.'));
 
                         if (!isNaN(valorNumerico) && Math.abs(valorNumerico) > 0.001) {
@@ -887,7 +913,6 @@
                     }
                 });
 
-                // Se todos os valores da coluna forem zero, oculta o cabeçalho e as células
                 const displayVal = todosZero ? 'none' : '';
                 headers[colIndex].style.display = displayVal;
                 linhas.forEach(linha => {
