@@ -18,14 +18,13 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 - Décimo terceiro salário
 - Regime de previdência e contribuição Prevcom
 - Dependentes para IRPF
-- Auxílio-alimentação, auxílio-saúde, auxílio-creche e outras verbas
-- Descontos da associação (ASSCONTAS), SERPRO e outros descontos em folha
+- Auxílio-alimentação, auxílio-saúde, auxílio-creche e outras verbas indenizatórias
+- Descontos da associação (ASSCONTAS), AudTCE-MG, SERPRO e outros descontos em folha
 - Abate-teto e cálculo de base previdenciária e tributária
 - Projeção de reajuste inflacionário (%)
 
 ## O que (ainda) não está contemplado
 
-- Desconto do AudTCE-MG
 - Férias
 - Variações no desconto da ASSCONTAS
 - Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
