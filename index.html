@@ -209,6 +209,51 @@
             flex-shrink: 0;
         }
 
+        .filho-creche-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            grid-column: 1 / -1;
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+
+        .filho-creche-label {
+            min-width: 90px;
+            font-weight: 600;
+            font-size: 0.92em;
+        }
+
+        .filho-creche-controls {
+            display: flex;
+            gap: 12px;
+            flex: 1;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .btn-adicionar-creche {
+            padding: 8px 14px;
+            border: 1px solid var(--primary-color);
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-remover-creche {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
         label {
             font-weight: 600;
             font-size: 0.92em;
@@ -506,42 +551,10 @@
                     <label for="outrosDescontos">Outros descontos em folha (R$):</label>
                     <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
-                <div class="form-group">
-                    <label for="filho1Tipo">Filho 1 - Aux. Creche:</label>
-                    <select id="filho1Tipo" onchange="calcularSimulacao()">
-                        <option value="NENHUM">Nenhum</option>
-                        <option value="PADRAO">Padrão</option>
-                        <option value="ESPECIAL">Especial</option>
-                    </select>
+                <div class="form-group" style="grid-column: 1 / -1; justify-content: flex-start; gap: 12px;">
+                    <button type="button" class="btn-adicionar-creche" onclick="adicionarFilhoCreche()">Adicionar Auxílio-Creche</button>
                 </div>
-                <div class="form-group">
-                    <label for="filho1Idade">Filho 1 - Idade:</label>
-                    <input type="number" id="filho1Idade" value="0" min="0" max="6" onchange="calcularSimulacao()">
-                </div>
-                <div class="form-group">
-                    <label for="filho2Tipo">Filho 2 - Aux. Creche:</label>
-                    <select id="filho2Tipo" onchange="calcularSimulacao()">
-                        <option value="NENHUM">Nenhum</option>
-                        <option value="PADRAO">Padrão</option>
-                        <option value="ESPECIAL">Especial</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="filho2Idade">Filho 2 - Idade:</label>
-                    <input type="number" id="filho2Idade" value="0" min="0" max="6" onchange="calcularSimulacao()">
-                </div>
-                <div class="form-group">
-                    <label for="filho3Tipo">Filho 3 - Aux. Creche:</label>
-                    <select id="filho3Tipo" onchange="calcularSimulacao()">
-                        <option value="NENHUM">Nenhum</option>
-                        <option value="PADRAO">Padrão</option>
-                        <option value="ESPECIAL">Especial</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="filho3Idade">Filho 3 - Idade:</label>
-                    <input type="number" id="filho3Idade" value="0" min="0" max="6" onchange="calcularSimulacao()">
-                </div>
+                <div id="listaFilhosCreche" class="form-grid" style="grid-column: 1 / -1; margin-top: 4px;"></div>
             </div>
         </div>
     </div>
@@ -741,6 +754,11 @@
         }
 
         function salvarEstado() {
+            const filhosCreche = Array.from(document.querySelectorAll('#listaFilhosCreche .filho-creche-item')).map((item) => ({
+                tipo: item.querySelector('select').value,
+                idadeInicial: parseInt(item.querySelector('input').value) || 0,
+            }));
+
             const estado = {
                 anoInicial: document.getElementById('anoInicial').value,
                 pontosADE: document.getElementById('pontosADE').value,
@@ -752,12 +770,7 @@
                 funcaoGratificada: document.getElementById('funcaoGratificada').value,
                 decimoTerceiroSalario: document.getElementById('decimoTerceiroSalario').value,
                 outrasVerbasIndenizatorias: document.getElementById('outrasVerbasIndenizatorias').value,
-                filho1Tipo: document.getElementById('filho1Tipo').value,
-                filho1Idade: document.getElementById('filho1Idade').value,
-                filho2Tipo: document.getElementById('filho2Tipo').value,
-                filho2Idade: document.getElementById('filho2Idade').value,
-                filho3Tipo: document.getElementById('filho3Tipo').value,
-                filho3Idade: document.getElementById('filho3Idade').value,
+                filhosCreche: filhosCreche,
                 associadoAsscontas: document.getElementById('associadoAsscontas').checked,
                 associadoAudtce: document.getElementById('associadoAudtce').checked,
                 incideAdePrev: document.getElementById('incideAdePrev').checked,
@@ -786,17 +799,14 @@
                     if (estado.funcaoGratificada !== undefined) document.getElementById('funcaoGratificada').value = estado.funcaoGratificada;
                     if (estado.decimoTerceiroSalario !== undefined) document.getElementById('decimoTerceiroSalario').value = estado.decimoTerceiroSalario;
                     if (estado.outrasVerbasIndenizatorias !== undefined) document.getElementById('outrasVerbasIndenizatorias').value = estado.outrasVerbasIndenizatorias;
-                    if (estado.filho1Tipo !== undefined) document.getElementById('filho1Tipo').value = estado.filho1Tipo;
-                    if (estado.filho1Idade !== undefined) document.getElementById('filho1Idade').value = estado.filho1Idade;
-                    if (estado.filho2Tipo !== undefined) document.getElementById('filho2Tipo').value = estado.filho2Tipo;
-                    if (estado.filho2Idade !== undefined) document.getElementById('filho2Idade').value = estado.filho2Idade;
-                    if (estado.filho3Tipo !== undefined) document.getElementById('filho3Tipo').value = estado.filho3Tipo;
-                    if (estado.filho3Idade !== undefined) document.getElementById('filho3Idade').value = estado.filho3Idade;
                     if (estado.associadoAsscontas !== undefined) document.getElementById('associadoAsscontas').checked = estado.associadoAsscontas;
                     if (estado.associadoAudtce !== undefined) document.getElementById('associadoAudtce').checked = estado.associadoAudtce;
                     if (estado.incideAdePrev !== undefined) document.getElementById('incideAdePrev').checked = estado.incideAdePrev;
                     if (estado.incideFuncaoPrev !== undefined) document.getElementById('incideFuncaoPrev').checked = estado.incideFuncaoPrev;
                     if (estado.outrosDescontos !== undefined) document.getElementById('outrosDescontos').value = estado.outrosDescontos;
+                    if (estado.filhosCreche && Array.isArray(estado.filhosCreche)) {
+                        renderizarListaFilhosCreche(estado.filhosCreche);
+                    }
                 }
             } catch (e) {
                 console.warn("Erro ao ler estado do localStorage:", e);
@@ -840,6 +850,7 @@
                 selectFG.appendChild(opt);
             }
 
+            renderizarListaFilhosCreche();
             carregarEstado();
             calcularSimulacao();
             atualizarBotaoTema();
@@ -862,19 +873,116 @@
             return total;
         }
 
+        function renderizarListaFilhosCreche(filhos = []) {
+            const container = document.getElementById('listaFilhosCreche');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const dadosFilhos = Array.isArray(filhos) && filhos.length > 0 ? filhos : [];
+
+            dadosFilhos.forEach((filho, index) => {
+                const item = document.createElement('div');
+                item.className = 'filho-creche-item';
+
+                const label = document.createElement('div');
+                label.className = 'filho-creche-label';
+                label.textContent = `Auxílio-Creche ${index + 1}`;
+
+                const controls = document.createElement('div');
+                controls.className = 'filho-creche-controls';
+
+                const select = document.createElement('select');
+                select.id = `filho${index + 1}Tipo`;
+                select.setAttribute('onchange', 'atualizarCamposFilhos(); calcularSimulacao();');
+                select.innerHTML = `
+                    <option value="NENHUM">Nenhum</option>
+                    <option value="PADRAO">Padrão</option>
+                    <option value="ESPECIAL">Especial</option>
+                `;
+                select.value = filho.tipo || 'NENHUM';
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `filho${index + 1}Idade`;
+                input.value = filho.idadeInicial ?? 0;
+                input.min = '0';
+                input.max = '6';
+                input.setAttribute('onchange', 'calcularSimulacao();');
+
+                const labelIdade = document.createElement('label');
+                labelIdade.setAttribute('for', input.id);
+                labelIdade.textContent = 'Idade:';
+
+                const botaoRemover = document.createElement('button');
+                botaoRemover.type = 'button';
+                botaoRemover.className = 'btn-remover-creche';
+                botaoRemover.textContent = 'Remover';
+                botaoRemover.onclick = () => {
+                    removerFilhoCreche(index);
+                };
+
+                controls.appendChild(select);
+                controls.appendChild(labelIdade);
+                controls.appendChild(input);
+                controls.appendChild(botaoRemover);
+
+                item.appendChild(label);
+                item.appendChild(controls);
+                container.appendChild(item);
+            });
+
+            atualizarCamposFilhos();
+        }
+
+        function adicionarFilhoCreche() {
+            const container = document.getElementById('listaFilhosCreche');
+            if (!container) return;
+
+            const filhosAtuais = obterFilhosCreche();
+            filhosAtuais.push({ tipo: 'NENHUM', idadeInicial: 0 });
+            renderizarListaFilhosCreche(filhosAtuais);
+            calcularSimulacao();
+        }
+
+        function removerFilhoCreche(index) {
+            const filhosAtuais = obterFilhosCreche();
+            filhosAtuais.splice(index, 1);
+            renderizarListaFilhosCreche(filhosAtuais);
+            calcularSimulacao();
+        }
+
         function atualizarCamposFilhos() {
-            for (let i = 1; i <= 3; i++) {
-                const selectTipo = document.getElementById(`filho${i}Tipo`);
-                const inputIdade = document.getElementById(`filho${i}Idade`);
+            document.querySelectorAll('#listaFilhosCreche .filho-creche-item').forEach((item) => {
+                const selectTipo = item.querySelector('select');
+                const inputIdade = item.querySelector('input');
                 if (selectTipo && inputIdade) {
                     inputIdade.disabled = (selectTipo.value === "NENHUM");
+                    inputIdade.placeholder = 'Idade';
+                    if (selectTipo.value === 'NENHUM') {
+                        inputIdade.value = '0';
+                    }
                 }
-            }
-            const selectRegime = document.getElementById(`regimePrevidencia`);
-            const inputAliquotaPrevcom = document.getElementById(`aliquotaPrevcom`);
+            });
+            const selectRegime = document.getElementById('regimePrevidencia');
+            const inputAliquotaPrevcom = document.getElementById('aliquotaPrevcom');
             if (selectRegime && inputAliquotaPrevcom) {
                 inputAliquotaPrevcom.disabled = (selectRegime.value !== "NOVO_PREVCOM");
             }
+        }
+
+        function obterFilhosCreche() {
+            const filhos = [];
+            document.querySelectorAll('#listaFilhosCreche .filho-creche-item').forEach((item) => {
+                const selectTipo = item.querySelector('select');
+                const inputIdade = item.querySelector('input');
+                if (!selectTipo || !inputIdade) return;
+                filhos.push({
+                    tipo: selectTipo.value,
+                    idadeInicial: parseInt(inputIdade.value) || 0
+                });
+            });
+            return filhos;
         }
 
         function ocultarColunasZero() {
@@ -951,11 +1059,7 @@
             const incideFuncaoPrev = document.getElementById('incideFuncaoPrev').checked;
             const nomeFG = document.getElementById('funcaoGratificada').value;
 
-            const filhos = [
-                { tipo: document.getElementById('filho1Tipo').value, idadeInicial: parseInt(document.getElementById('filho1Idade').value) || 0 },
-                { tipo: document.getElementById('filho2Tipo').value, idadeInicial: parseInt(document.getElementById('filho2Idade').value) || 0 },
-                { tipo: document.getElementById('filho3Tipo').value, idadeInicial: parseInt(document.getElementById('filho3Idade').value) || 0 }
-            ];
+            const filhos = obterFilhosCreche();
 
             const valorFGBase = FUNCOES_GRATIFICADAS[nomeFG] || 0.0;
             const tbody = document.getElementById('tabelaCorpo');
