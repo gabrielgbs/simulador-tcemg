@@ -335,17 +335,18 @@
             font-weight: bold;
         }
 
+        .col-bruta,
+        .valor-corrigido {
+            color: var(--blue-highlight) !important;
+            font-weight: bold;
+            background-color: var(--blue-highlight-bg) !important;
+        }
+
         .col-liquido,
         .col-decimo {
             background-color: var(--output-bg) !important;
             font-weight: bold;
             color: var(--color-liquido-text) !important;
-        }
-
-        .valor-corrigido {
-            color: var(--blue-highlight) !important;
-            font-weight: bold;
-            background-color: var(--blue-highlight-bg) !important;
         }
 
         /* Constantes Legais */
@@ -551,6 +552,7 @@
                         <option value="13">13 dias</option>
                         <option value="14">14 dias</option>
                         <option value="15">15 dias</option>
+                        <option value="25">25 dias</option>
                     </select>
                 </div>
                 <div id="listaFilhosCreche" class="form-grid" style="grid-column: 1 / -1; margin-top: 0;">
@@ -1190,7 +1192,7 @@
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
                     <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
-                    <td class="col-destaque">${formatarMoeda(remunBrutaTotal)}</td>
+                    <td class="col-bruta">${formatarMoeda(remunBrutaTotal)}</td>
                     <td class="col-destaque">${formatarMoeda(abateTeto)}</td>
                     <td>${formatarMoeda(descPrevidencia)}</td>
                     <td>${formatarMoeda(descPrevcom)}</td>
