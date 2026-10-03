@@ -210,28 +210,67 @@
         }
 
         .filho-creche-item {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+            gap: 10px 16px;
             grid-column: 1 / -1;
             border-top: 1px solid var(--border-color);
             padding-top: 10px;
         }
 
         .filho-creche-label {
-            min-width: 90px;
+            min-width: 0;
             font-weight: 600;
             font-size: 0.92em;
+            white-space: nowrap;
         }
 
         .filho-creche-controls {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             flex: 1;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: flex-start;
             flex-wrap: wrap;
+        }
+
+        @media (max-width: 700px) {
+            .filho-creche-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .filho-creche-label {
+                white-space: normal;
+            }
+
+            .filho-creche-controls {
+                width: 100%;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px 10px;
+                justify-content: stretch;
+            }
+
+            .filho-creche-controls select {
+                grid-column: 1 / -1;
+            }
+
+            .filho-creche-controls label {
+                grid-column: 1 / -1;
+                margin-top: 2px;
+            }
+
+            .filho-creche-controls input {
+                grid-column: 1;
+                width: 100%;
+            }
+
+            .filho-creche-controls .btn-remover-creche {
+                grid-column: 2;
+                justify-self: end;
+            }
         }
 
         .btn-adicionar-creche {

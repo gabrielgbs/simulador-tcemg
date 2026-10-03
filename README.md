@@ -54,8 +54,8 @@ Caso você queira adicionar esses recursos, fico feliz em receber seu pull-reque
 
 - A simulação foi estruturada com base na Lei Estadual nº 25.808/2026.
 - O projeto é uma ferramenta de estimativa e pode servir como referência para análise e planejamento pessoal.
-- Pequenas defasagens de R$0,01 podem ocorrer por arredondamento.
-- O cálculo do RPPS pode apresentar divergência em relação ao contracheque real. Por favor me informe caso aconteça com você.
+- Pequenas defasagens de R$0,01 podem ocorrer por conta de arredondamentos.
+- Os cálculos, em especial os descontos, podem apresentar divergências em relação ao contracheque real. Por favor me informe caso aconteça com você.
 - O projeto é uma página estática em HTML/CSS/JavaScript, sem dependências externas.
 - Os valores podem ser usados apenas como referência para análise e planejamento pessoal.
 - Caso você tenha sugestões, críticas, ou encontre um bug, entre em contato comigo pelo Teams.
