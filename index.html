@@ -540,6 +540,19 @@
                     <label for="outrasVerbasIndenizatorias">Outras verbas indenizatórias (R$):</label>
                     <input type="number" id="outrasVerbasIndenizatorias" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
+                <div class="form-group">
+                    <label for="feriasDias">Férias:</label>
+                    <select id="feriasDias" onchange="calcularSimulacao()">
+                        <option value="0">Não</option>
+                        <option value="5">5 dias</option>
+                        <option value="10">10 dias</option>
+                        <option value="11">11 dias</option>
+                        <option value="12">12 dias</option>
+                        <option value="13">13 dias</option>
+                        <option value="14">14 dias</option>
+                        <option value="15">15 dias</option>
+                    </select>
+                </div>
                 <div id="listaFilhosCreche" class="form-grid" style="grid-column: 1 / -1; margin-top: 0;">
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1; justify-content: flex-end; gap: 12px; margin-top: 0;">
@@ -577,18 +590,20 @@
                     <th>Vencimento Base</th>
                     <th>ADE</th>
                     <th>Função Grat.</th>
+                    <th>Férias</th>
+                    <th>Aux. Creche</th>
                     <th>Aux. Alimentação</th>
                     <th>Aux. Saúde</th>
                     <th>Outras verbas indenizatórias</th>
-                    <th>Aux. Creche</th>
                     <th>Remuneração Bruta</th>
                     <th>Abate-Teto</th>
                     <th>Desc. Previdência</th>
                     <th>Desc. Prevcom</th>
                     <th>Desc. IRPF</th>
+                    <th>IRPF Férias</th>
                     <th>ASSCONTAS</th>
                     <th>AudTCE-MG</th>
-                    <th>Outros descontos</th>
+                    <th>Outros Descontos</th>
                     <th>Total Descontos</th>
                     <th id="header-remuneracao-liquida">Remuneração Líquida</th>
                     <th>13º Salário (Líq.)</th>
@@ -778,6 +793,7 @@
                 funcaoGratificada: document.getElementById('funcaoGratificada').value,
                 decimoTerceiroSalario: document.getElementById('decimoTerceiroSalario').value,
                 outrasVerbasIndenizatorias: document.getElementById('outrasVerbasIndenizatorias').value,
+                feriasDias: document.getElementById('feriasDias').value,
                 filhosCreche: filhosCreche,
                 associadoAsscontas: document.getElementById('associadoAsscontas').checked,
                 associadoAudtce: document.getElementById('associadoAudtce').checked,
@@ -807,6 +823,7 @@
                     if (estado.funcaoGratificada !== undefined) document.getElementById('funcaoGratificada').value = estado.funcaoGratificada;
                     if (estado.decimoTerceiroSalario !== undefined) document.getElementById('decimoTerceiroSalario').value = estado.decimoTerceiroSalario;
                     if (estado.outrasVerbasIndenizatorias !== undefined) document.getElementById('outrasVerbasIndenizatorias').value = estado.outrasVerbasIndenizatorias;
+                    if (estado.feriasDias !== undefined) document.getElementById('feriasDias').value = estado.feriasDias;
                     if (estado.associadoAsscontas !== undefined) document.getElementById('associadoAsscontas').checked = estado.associadoAsscontas;
                     if (estado.associadoAudtce !== undefined) document.getElementById('associadoAudtce').checked = estado.associadoAudtce;
                     if (estado.incideAdePrev !== undefined) document.getElementById('incideAdePrev').checked = estado.incideAdePrev;
@@ -1063,6 +1080,7 @@
             const qtdDependentesIRPF = parseInt(document.getElementById('qtdDependentesIRPF').value) || 0;
             const opcaoDecimoTerceiro = document.getElementById('decimoTerceiroSalario').value || 'NAO';
             const outrasVerbasIndenizatorias = Math.max(0.0, parseFloat(document.getElementById('outrasVerbasIndenizatorias').value) || 0.0);
+            const diasFerias = Math.max(0, parseInt(document.getElementById('feriasDias').value) || 0);
             const incideAdePrev = document.getElementById('incideAdePrev').checked;
             const incideFuncaoPrev = document.getElementById('incideFuncaoPrev').checked;
             const nomeFG = document.getElementById('funcaoGratificada').value;
@@ -1109,7 +1127,8 @@
                 // Idade da criança evolui a partir do ano inicial visível da simulação
                 const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
                 const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
-                const remunBrutaTotal = vencimentoBase + valorADE + valorFG + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno;
+                const valorFerias = diasFerias > 0 ? ((vencimentoBase + valorADE + valorFG) / (22 * 3)) * diasFerias : 0.0;
+                const remunBrutaTotal = vencimentoBase + valorADE + valorFG + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno + valorFerias;
 
                 let descPrevidencia = 0.0;
                 if (regimePrev === "ANTIGO_RPPS") {
@@ -1131,6 +1150,7 @@
                 const deducaoDependentesTotal = qtdDependentesIRPF * CONSTANTES.DEDUCAO_DEPENDENTE_IRPF;
                 const baseIRPF = Math.max(0.0, remunEfetivaTributavel - descPrevidencia - descPrevcom - deducaoDependentesTotal);
                 const descIRPF = Math.max(0.0, (baseIRPF * CONSTANTES.ALIQUOTA_MAX_IRPF) - CONSTANTES.PARCELA_DEDUZIR_IRPF);
+                const impostoFerias = valorFerias * CONSTANTES.ALIQUOTA_MAX_IRPF;
 
                 const valorBaseDecimo = remunSujeitaTeto;
                 const primeiraParcelaDecimo = valorBaseDecimo / 2.0;
@@ -1149,8 +1169,8 @@
                 const descAudtce = eAssociadoAudtce ? CONSTANTES.DESCONTO_AUDTCE_MG : 0.0;
                 const descOutros = Math.max(0.0, parseFloat(document.getElementById('outrosDescontos').value) || 0.0);
 
-                // Soma total dos descontos (Previdência + Prevcom + IRPF + Abate-Teto + ASSCONTAS + AudTCE-MG + Outros)
-                const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + abateTeto + descAsscontas + descAudtce + descOutros;
+                // Soma total dos descontos (Previdência + Prevcom + IRPF + IRPF Férias + Abate-Teto + ASSCONTAS + AudTCE-MG + Outros)
+                const totalDescontosComAbate = descPrevidencia + descPrevcom + descIRPF + impostoFerias + abateTeto + descAsscontas + descAudtce + descOutros;
 
                 // Remuneração Líquida Final (bruta total menos os descontos de folha efetivos)
                 const remunLiquida = remunBrutaTotal - totalDescontosComAbate;
@@ -1164,15 +1184,17 @@
                     <td class="${classeCorrigida}">${formatarMoeda(vencimentoBase)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorADE)}</td>
                     <td class="${classeCorrigida}">${formatarMoeda(valorFG)}</td>
+                    <td>${formatarMoeda(valorFerias)}</td>
+                    <td>${formatarMoeda(valorAuxCrecheAno)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO)}</td>
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
                     <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
-                    <td>${formatarMoeda(valorAuxCrecheAno)}</td>
                     <td class="col-destaque">${formatarMoeda(remunBrutaTotal)}</td>
                     <td class="col-destaque">${formatarMoeda(abateTeto)}</td>
                     <td>${formatarMoeda(descPrevidencia)}</td>
                     <td>${formatarMoeda(descPrevcom)}</td>
                     <td>${formatarMoeda(descIRPF)}</td>
+                    <td>${formatarMoeda(impostoFerias)}</td>
                     <td>${formatarMoeda(descAsscontas)}</td>
                     <td>${formatarMoeda(descAudtce)}</td>
                     <td>${formatarMoeda(descOutros)}</td>
