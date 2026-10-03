@@ -1127,7 +1127,7 @@
                 // Idade da criança evolui a partir do ano inicial visível da simulação
                 const anosPassadosNaSimulacao = (ano - anoInicial) + 1;
                 const valorAuxCrecheAno = calcularAuxilioCrecheAno(filhos, anosPassadosNaSimulacao);
-                const valorFerias = diasFerias > 0 ? ((vencimentoBase + valorADE + valorFG) / (22 * 3)) * diasFerias : 0.0;
+                const valorFerias = diasFerias > 0 ? ((remunEfetivaTributavel) / (22 * 3)) * diasFerias : 0.0;
                 const remunBrutaTotal = vencimentoBase + valorADE + valorFG + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + outrasVerbasIndenizatorias + valorAuxCrecheAno + valorFerias;
 
                 let descPrevidencia = 0.0;
@@ -1143,8 +1143,9 @@
                 }
 
                 let descPrevcom = 0.0;
-                if (regimePrev === "NOVO_PREVCOM" && basePrevidencia > CONSTANTES.TETO_RGPS) {
-                    descPrevcom = (basePrevidencia - CONSTANTES.TETO_RGPS) * aliquotaPrevcom;
+                if (regimePrev === "NOVO_PREVCOM") {
+                    const basePrevcomAposAbate = Math.max(0.0, remunEfetivaTributavel - CONSTANTES.TETO_RGPS);
+                    descPrevcom = basePrevcomAposAbate * aliquotaPrevcom;
                 }
 
                 const deducaoDependentesTotal = qtdDependentesIRPF * CONSTANTES.DEDUCAO_DEPENDENTE_IRPF;
