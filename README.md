@@ -26,6 +26,7 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 ## O que (ainda) não está contemplado
 
 - Auxílios-Creche sem idade limite
+- Adicionais por tempo de serviço
 - Variações no desconto da ASSCONTAS
 - Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
 - Carreira de Oficial de Controle Externo
