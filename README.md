@@ -26,6 +26,7 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 ## O que (ainda) não está contemplado
 
 - Férias
+- Auxílios-Creche sem idade limite
 - Variações no desconto da ASSCONTAS
 - Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
 - Carreira de Oficial de Controle Externo
@@ -45,6 +46,10 @@ Caso você queira adicionar esses recursos, fico feliz em receber seu pull-reque
 - Persistência dos dados preenchidos no navegador; ou seja, o navegador se lembra dos seus últimos parâmetros 😉
 - Tema claro/escuro
 - Ocultação automática de colunas zeradas na tabela para facilitar leitura
+
+## IMPORTANTE!!!
+
+- Este simulador é um projeto independente para fins informativos e não constitui uma ferramenta oficial do TCE-MG. Os cálculos podem conter imprecisões e não substituem os demonstrativos oficiais de pagamento.
 
 ## Observações
 

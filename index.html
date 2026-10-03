@@ -460,7 +460,8 @@
         <div class="tabs-header">
             <button type="button" class="tab-btn active" onclick="alternarAba(event, 'tab-carreira')">Carreira</button>
             <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-previdencia')">Previdência</button>
-            <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-adicionais')">Adicionais e Descontos</button>
+            <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-adicionais')">Adicionais</button>
+            <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-descontos')">Descontos</button>
         </div>
 
         <!-- Aba 1: Carreira -->
@@ -520,20 +521,12 @@
             </div>
         </div>
 
-        <!-- Aba 3: Adicionais e Descontos -->
+        <!-- Aba 3: Adicionais -->
         <div id="tab-adicionais" class="tab-panel">
             <div class="form-grid">
                 <div class="form-group">
                     <label for="qtdDependentesIRPF">Dependentes para IRPF:</label>
                     <input type="number" id="qtdDependentesIRPF" value="0" min="0" onchange="calcularSimulacao()">
-                </div>
-                <div class="form-group form-group-checkbox">
-                    <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
-                    <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
-                </div>
-                <div class="form-group form-group-checkbox">
-                    <label for="associadoAudtce">É associado(a) da AudTCE-MG?</label>
-                    <input type="checkbox" id="associadoAudtce" onchange="calcularSimulacao()">
                 </div>
                 <div class="form-group">
                     <label for="decimoTerceiroSalario">13º Salário:</label>
@@ -547,14 +540,29 @@
                     <label for="outrasVerbasIndenizatorias">Outras verbas indenizatórias (R$):</label>
                     <input type="number" id="outrasVerbasIndenizatorias" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
+                <div id="listaFilhosCreche" class="form-grid" style="grid-column: 1 / -1; margin-top: 0;">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1; justify-content: flex-end; gap: 12px; margin-top: 0;">
+                    <button type="button" class="btn-adicionar-creche" onclick="adicionarFilhoCreche()">Adicionar Auxílio-Creche</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba 4: Descontos -->
+        <div id="tab-descontos" class="tab-panel">
+            <div class="form-grid">
+                <div class="form-group form-group-checkbox">
+                    <label for="associadoAsscontas">É associado(a) da ASSCONTAS?</label>
+                    <input type="checkbox" id="associadoAsscontas" onchange="calcularSimulacao()">
+                </div>
+                <div class="form-group form-group-checkbox">
+                    <label for="associadoAudtce">É associado(a) da AudTCE-MG?</label>
+                    <input type="checkbox" id="associadoAudtce" onchange="calcularSimulacao()">
+                </div>
                 <div class="form-group">
                     <label for="outrosDescontos">Outros descontos em folha (R$):</label>
                     <input type="number" id="outrosDescontos" value="0.00" step="10" min="0" onchange="calcularSimulacao()">
                 </div>
-                <div class="form-group" style="grid-column: 1 / -1; justify-content: flex-start; gap: 12px;">
-                    <button type="button" class="btn-adicionar-creche" onclick="adicionarFilhoCreche()">Adicionar Auxílio-Creche</button>
-                </div>
-                <div id="listaFilhosCreche" class="form-grid" style="grid-column: 1 / -1; margin-top: 4px;"></div>
             </div>
         </div>
     </div>
