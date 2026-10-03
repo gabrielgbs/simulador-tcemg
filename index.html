@@ -276,11 +276,13 @@
             background-color: var(--table-row-hover) !important;
         }
 
-        tbody tr:hover td.col-liquido {
+        tbody tr:hover td.col-liquido,
+        tbody tr:hover td.col-decimo {
             filter: brightness(0.96);
         }
 
-        [data-theme="dark"] tbody tr:hover td.col-liquido {
+        [data-theme="dark"] tbody tr:hover td.col-liquido,
+        [data-theme="dark"] tbody tr:hover td.col-decimo {
             filter: brightness(1.15);
         }
 
@@ -288,7 +290,8 @@
             font-weight: bold;
         }
 
-        .col-liquido {
+        .col-liquido,
+        .col-decimo {
             background-color: var(--output-bg) !important;
             font-weight: bold;
             color: var(--color-liquido-text) !important;
@@ -1063,7 +1066,7 @@
                     <td>${formatarMoeda(descOutros)}</td>
                     <td class="col-destaque">${formatarMoeda(totalDescontosComAbate)}</td>
                     <td class="col-liquido">${formatarMoeda(remunLiquida)}</td>
-                    <td>${formatarMoeda(valorDecimoSalario)}</td>
+                    <td class="col-decimo">${formatarMoeda(valorDecimoSalario)}</td>
                     <td class="col-liquido">${formatarMoeda(somaRemuneracaoLiquida)}</td>
                 `;
                 tbody.appendChild(tr);
