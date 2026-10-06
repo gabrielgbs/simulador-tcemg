@@ -927,10 +927,12 @@
             filhos.forEach(filho => {
                 if (filho.tipo !== "NENHUM") {
                     let idadeNoAno = filho.idadeInicial + (anoSimulacao - 1);
-                    if (idadeNoAno <= CONSTANTES.IDADE_MAXIMA_CRECHE) {
+                    const aplicaSemLimite = filho.tipo === "ESPECIAL_SEM_IDADE";
+
+                    if (aplicaSemLimite || idadeNoAno <= CONSTANTES.IDADE_MAXIMA_CRECHE) {
                         if (filho.tipo === "PADRAO") {
                             total += CONSTANTES.AUXILIO_CRECHE_PADRAO;
-                        } else if (filho.tipo === "ESPECIAL") {
+                        } else if (filho.tipo === "ESPECIAL" || filho.tipo === "ESPECIAL_SEM_IDADE") {
                             total += CONSTANTES.AUXILIO_CRECHE_ESPECIAL;
                         }
                     }
@@ -962,11 +964,11 @@
                 select.id = `filho${index + 1}Tipo`;
                 select.setAttribute('onchange', 'atualizarCamposFilhos(); calcularSimulacao();');
                 select.innerHTML = `
-                    <option value="NENHUM">Nenhum</option>
                     <option value="PADRAO">Padrão</option>
                     <option value="ESPECIAL">Especial</option>
+                    <option value="ESPECIAL_SEM_IDADE">Especial sem limite de idade</option>
                 `;
-                select.value = filho.tipo || 'NENHUM';
+                select.value = (filho.tipo && filho.tipo !== 'NENHUM') ? filho.tipo : 'PADRAO';
 
                 const input = document.createElement('input');
                 input.type = 'number';
@@ -1023,7 +1025,8 @@
                 const selectTipo = item.querySelector('select');
                 const inputIdade = item.querySelector('input');
                 if (selectTipo && inputIdade) {
-                    inputIdade.disabled = (selectTipo.value === "NENHUM");
+                    const semIdade = (selectTipo.value === "NENHUM" || selectTipo.value === "ESPECIAL_SEM_IDADE");
+                    inputIdade.disabled = semIdade;
                     inputIdade.placeholder = 'Idade';
                     if (selectTipo.value === 'NENHUM') {
                         inputIdade.value = '0';
