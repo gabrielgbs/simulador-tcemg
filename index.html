@@ -128,6 +128,37 @@
         }
 
         /* Abas de Navegação */
+        .mode-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background: var(--bg-light);
+            margin: 0 auto 20px auto;
+            width: fit-content;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .mode-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(47,84,150,0.2);
+        }
+
         .tabs-header {
             display: flex;
             border-bottom: 2px solid var(--border-color);
@@ -406,6 +437,106 @@
         .text-center { text-align: center; }
         .text-left { text-align: left; }
 
+        .comparison-panel {
+            display: none;
+            gap: 20px;
+        }
+
+        .comparison-panel.active {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .comparison-column {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            padding: 15px;
+        }
+
+        .comparison-column h4 {
+            margin: 0 0 15px;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 8px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .comparison-results {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .comparison-results.active {
+            display: block;
+        }
+
+        .comparison-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comparison-result-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .comparison-result-box .label {
+            display: block;
+            font-size: 0.8em;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .comparison-result-box .value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .comparison-table {
+            margin-top: 12px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid var(--table-border);
+            padding: 8px 10px;
+        }
+
+        .comparison-table th {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .comparison-table td:nth-child(2),
+        .comparison-table td:nth-child(3) {
+            text-align: right;
+        }
+
+        .comparison-table tr.total-row td {
+            font-weight: 700;
+            background: var(--output-bg);
+        }
+
+        .comparison-table tr.diff-row td {
+            font-weight: 700;
+            background: var(--blue-highlight-bg);
+        }
+
         /* Responsividade para Dispositivos Móveis */
         @media (max-width: 600px) {
             body {
@@ -457,6 +588,14 @@
                 width: 22px;
                 height: 22px;
             }
+
+            .comparison-panel.active {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-summary {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -494,9 +633,14 @@
         </button>
     </div>
 
+    <div class="mode-toggle" aria-label="Modo do simulador">
+        <button type="button" class="mode-btn active" data-modo="carreira" onclick="alternarModo('carreira')">Carreira</button>
+        <button type="button" class="mode-btn" data-modo="comparacao" onclick="alternarModo('comparacao')">Comparação</button>
+    </div>
+
     <!-- Painel de Parâmetros -->
     <!-- Painel de Parâmetros em Abas -->
-    <div class="card">
+    <div id="panel-carreira" class="card">
         <div class="tabs-header">
             <button type="button" class="tab-btn active" onclick="alternarAba(event, 'tab-carreira')">Carreira</button>
             <button type="button" class="tab-btn" onclick="alternarAba(event, 'tab-previdencia')">Previdência</button>
@@ -621,8 +765,19 @@
         </div>
     </div>
 
+    <div id="panel-comparacao" class="card comparison-panel">
+        <div class="comparison-column">
+            <h4>Cenário A</h4>
+            <div class="comparison-grid" id="comparacao-coluna-a"></div>
+        </div>
+        <div class="comparison-column">
+            <h4>Cenário B</h4>
+            <div class="comparison-grid" id="comparacao-coluna-b"></div>
+        </div>
+    </div>
+
     <!-- Tabela Principal de Simulação -->
-    <div class="table-container">
+    <div id="carreira-table-container" class="table-container">
         <table>
             <thead>
                 <tr>
@@ -655,6 +810,30 @@
         </table>
     </div>
 
+    <div id="comparacao-results" class="comparison-results card">
+        <h3>Comparação dos Cenários</h3>
+        <div class="comparison-summary">
+            <div class="comparison-result-box">
+                <span class="label">Salário líquido — Cenário A</span>
+                <span id="comparacao-liquido-a" class="value">R$ 0,00</span>
+            </div>
+            <div class="comparison-result-box">
+                <span class="label">Salário líquido — Cenário B</span>
+                <span id="comparacao-liquido-b" class="value">R$ 0,00</span>
+            </div>
+        </div>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Verba</th>
+                    <th>Cenário A</th>
+                    <th>Cenário B</th>
+                </tr>
+            </thead>
+            <tbody id="comparacao-tabela-corpo"></tbody>
+        </table>
+    </div>
+
     <!-- Constantes Legais no Rodapé -->
     <div class="card">
         <h3>Constantes Utilizadas (Lei 25.808/2026)</h3>
@@ -677,6 +856,8 @@
     <script>
         const CHAVE_STORAGE = "simulador_tcemg_estado_v6";
         const CHAVE_STORAGE_TEMA = "simulador_tcemg_tema";
+        const CHAVE_STORAGE_MODO = "simulador_tcemg_modo";
+        const CHAVE_STORAGE_COMPARACAO = "simulador_tcemg_comparacao";
 
         // Aplica o tema imediatamente antes de renderizar a página
         function aplicarTemaInicial() {
@@ -810,9 +991,444 @@
             document.getElementById(idAba).classList.add('active');
             event.currentTarget.classList.add('active');
         }
-        
+
+        function obterModoAtual() {
+            const modoSalvo = localStorage.getItem(CHAVE_STORAGE_MODO);
+            if (modoSalvo === 'carreira' || modoSalvo === 'comparacao') {
+                return modoSalvo;
+            }
+            return 'carreira';
+        }
+
+        function alternarModo(modo) {
+            localStorage.setItem(CHAVE_STORAGE_MODO, modo);
+            atualizarModoVisual();
+            if (modo === 'comparacao') {
+                calcularComparacao();
+            }
+        }
+
+        function atualizarModoVisual() {
+            const modoAtual = obterModoAtual();
+            document.querySelectorAll('.mode-btn').forEach(botao => {
+                botao.classList.toggle('active', botao.dataset.modo === modoAtual);
+            });
+
+            const emCarreira = modoAtual === 'carreira';
+            document.getElementById('panel-carreira').style.display = emCarreira ? 'block' : 'none';
+            document.getElementById('carreira-table-container').style.display = emCarreira ? 'block' : 'none';
+            document.getElementById('panel-comparacao').classList.toggle('active', !emCarreira);
+            document.getElementById('comparacao-results').classList.toggle('active', !emCarreira);
+        }
+
         function formatarMoeda(valor) {
             return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function preencherOpcoesAno(select, valorPadrao = 1) {
+            select.innerHTML = '';
+            for (let a = 1; a <= 17; a++) {
+                const opt = document.createElement('option');
+                opt.value = String(a);
+                opt.textContent = `${a}º Ano` + (a === 1 ? ' (Ingresso / TC-59)' : '');
+                select.appendChild(opt);
+            }
+            select.value = String(valorPadrao);
+        }
+
+        function preencherOpcoesFuncao(select, valorPadrao = 'Nenhuma') {
+            select.innerHTML = '';
+            Object.keys(FUNCOES_GRATIFICADAS).forEach((fg) => {
+                const opt = document.createElement('option');
+                opt.value = fg;
+                opt.textContent = `${fg} (${formatarMoeda(FUNCOES_GRATIFICADAS[fg])})`;
+                select.appendChild(opt);
+            });
+            if (valorPadrao && Array.from(select.options).some(opt => opt.value === valorPadrao)) {
+                select.value = valorPadrao;
+            }
+        }
+
+        function construirCamposComparacao() {
+            const cenarios = ['a', 'b'];
+            cenarios.forEach((codigo) => {
+                const container = document.getElementById(`comparacao-coluna-${codigo}`);
+                if (!container) return;
+                container.innerHTML = '';
+
+                const campos = [
+                    { key: 'anoInicial', label: 'Ano Atual na Carreira:', type: 'select', options: Array.from({ length: 17 }, (_, i) => ({ value: i + 1, label: `${i + 1}º Ano` })) },
+                    { key: 'pontosADE', label: 'Pontos de ADE (0 a 100):', type: 'number', min: 0, max: 100, value: 100 },
+                    { key: 'avancoTitulacao', label: 'Avanço por Titulação:', type: 'select', options: [
+                        { value: 0, label: 'Nenhuma (0 padrões)' },
+                        { value: 1, label: 'Mestrado (+1 padrão)' },
+                        { value: 2, label: 'Doutorado (+2 padrões)' },
+                        { value: 3, label: 'Mestrado + Doutorado (+3 padrões)' }
+                    ] },
+                    { key: 'funcaoGratificada', label: 'Função / Cargo Comissionado:', type: 'select', options: Object.keys(FUNCOES_GRATIFICADAS).map((fg) => ({ value: fg, label: fg })) },
+                    { key: 'correcaoInflacao', label: 'Projeção Reajuste (%):', type: 'number', step: 0.5, value: 0 },
+                    { key: 'regimePrevidencia', label: 'Regime de Previdência:', type: 'select', options: [
+                        { value: 'NOVO_PREVCOM', label: 'Novo com Prevcom-MG' },
+                        { value: 'NOVO_SEM_PREVCOM', label: 'Novo sem Prevcom-MG' },
+                        { value: 'ANTIGO_RPPS', label: 'Antigo RPPS (Integral 16%)' }
+                    ] },
+                    { key: 'aliquotaPrevcom', label: 'Alíquota Prevcom (%):', type: 'number', step: 0.5, min: 0, max: 15, value: 7.5 },
+                    { key: 'incideAdePrev', label: 'ADE incide sobre a previdência?', type: 'checkbox', checked: true },
+                    { key: 'incideFuncaoPrev', label: 'Função incide sobre a previdência?', type: 'checkbox', checked: true },
+                    { key: 'qtdDependentesIRPF', label: 'Dependentes para IRPF:', type: 'number', min: 0, value: 0 },
+                    { key: 'decimoTerceiroSalario', label: '13º Salário:', type: 'select', options: [
+                        { value: 'NAO', label: 'Não' },
+                        { value: 'PRIMEIRA', label: '1ª Parcela' },
+                        { value: 'SEGUNDA', label: '2ª Parcela' }
+                    ] },
+                    { key: 'outrasVerbasIndenizatorias', label: 'Outras verbas indenizatórias (R$):', type: 'number', step: 10, min: 0, value: 0 },
+                    { key: 'feriasDias', label: 'Férias:', type: 'select', options: [
+                        { value: 0, label: 'Não' },
+                        { value: 5, label: '5 dias' },
+                        { value: 10, label: '10 dias' },
+                        { value: 11, label: '11 dias' },
+                        { value: 12, label: '12 dias' },
+                        { value: 13, label: '13 dias' },
+                        { value: 14, label: '14 dias' },
+                        { value: 15, label: '15 dias' },
+                        { value: 25, label: '25 dias' }
+                    ] },
+                    { key: 'associadoAsscontas', label: 'É associado(a) da ASSCONTAS?', type: 'checkbox', checked: false },
+                    { key: 'associadoAudtce', label: 'É associado(a) da AudTCE-MG?', type: 'checkbox', checked: false },
+                    { key: 'outrosDescontos', label: 'Outros descontos em folha (R$):', type: 'number', step: 10, min: 0, value: 0 }
+                ];
+
+                campos.forEach((campo) => {
+                    const group = document.createElement('div');
+                    group.className = 'form-group';
+                    if (campo.type === 'checkbox') {
+                        group.classList.add('form-group-checkbox');
+                        const label = document.createElement('label');
+                        label.setAttribute('for', `comp-${codigo}-${campo.key}`);
+                        label.textContent = campo.label;
+                        const input = document.createElement('input');
+                        input.type = 'checkbox';
+                        input.checked = Boolean(campo.checked);
+                        input.id = `comp-${codigo}-${campo.key}`;
+                        input.onchange = () => calcularComparacao();
+                        group.appendChild(label);
+                        group.appendChild(input);
+                        container.appendChild(group);
+                        return;
+                    }
+
+                    const label = document.createElement('label');
+                    label.setAttribute('for', `comp-${codigo}-${campo.key}`);
+                    label.textContent = campo.label;
+
+                    const input = document.createElement(campo.type === 'select' ? 'select' : 'input');
+                    input.id = `comp-${codigo}-${campo.key}`;
+                    input.name = `comp-${codigo}-${campo.key}`;
+                    if (campo.type === 'number') {
+                        input.type = 'number';
+                        if (campo.step !== undefined) input.step = String(campo.step);
+                        if (campo.min !== undefined) input.min = String(campo.min);
+                        if (campo.max !== undefined) input.max = String(campo.max);
+                        input.value = campo.value ?? 0;
+                    } else if (campo.type === 'select') {
+                        if (campo.options) {
+                            campo.options.forEach((option) => {
+                                const opt = document.createElement('option');
+                                opt.value = String(option.value);
+                                opt.textContent = option.label;
+                                input.appendChild(opt);
+                            });
+                        }
+                        input.value = String(campo.value ?? campo.options?.[0]?.value ?? '');
+                    }
+                    input.onchange = () => calcularComparacao();
+
+                    group.appendChild(label);
+                    group.appendChild(input);
+                    container.appendChild(group);
+                });
+            });
+
+            const valoresPadrao = {
+                a: { anoInicial: 1, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
+                b: { anoInicial: 5, pontosADE: 60, avancoTitulacao: 2, funcaoGratificada: 'FG-1', correcaoInflacao: 3, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 1, decimoTerceiroSalario: 'SEGUNDA', outrasVerbasIndenizatorias: 250, feriasDias: 15, associadoAsscontas: false, associadoAudtce: true, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 100 }
+            };
+
+            Object.keys(valoresPadrao).forEach((codigo) => {
+                Object.entries(valoresPadrao[codigo]).forEach(([key, value]) => {
+                    const input = document.getElementById(`comp-${codigo}-${key}`);
+                    if (!input) return;
+                    if (input.type === 'checkbox') {
+                        input.checked = Boolean(value);
+                    } else {
+                        input.value = String(value);
+                    }
+                });
+                renderizarListaFilhosCrecheComparacao(codigo, [{ tipo: 'PADRAO', idadeInicial: 0 }]);
+            });
+        }
+
+        function renderizarListaFilhosCrecheComparacao(codigo, filhos = []) {
+            const container = document.getElementById(`comparacao-coluna-${codigo}`);
+            if (!container) return;
+
+            let blocoCreche = container.querySelector('.comparacao-creche-wrap');
+            if (!blocoCreche) {
+                blocoCreche = document.createElement('div');
+                blocoCreche.className = 'comparacao-creche-wrap';
+                blocoCreche.style.marginTop = '18px';
+                blocoCreche.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+                        <strong style="font-size:0.92em;">Auxílio-Creche</strong>
+                        <button type="button" class="btn-adicionar-creche" onclick="adicionarFilhoCrecheComparacao('${codigo}')">Adicionar</button>
+                    </div>
+                    <div class="comparacao-creche-list"></div>
+                `;
+                container.appendChild(blocoCreche);
+            }
+
+            const lista = blocoCreche.querySelector('.comparacao-creche-list');
+            if (!lista) return;
+            lista.innerHTML = '';
+
+            const itens = Array.isArray(filhos) && filhos.length > 0 ? filhos : [];
+            itens.forEach((filho, index) => {
+                const item = document.createElement('div');
+                item.className = 'filho-creche-item';
+
+                const label = document.createElement('div');
+                label.className = 'filho-creche-label';
+                label.textContent = `Auxílio-Creche ${index + 1}`;
+
+                const controls = document.createElement('div');
+                controls.className = 'filho-creche-controls';
+
+                const select = document.createElement('select');
+                select.id = `comp-${codigo}-filho-${index}-tipo`;
+                select.innerHTML = `
+                    <option value="PADRAO">Padrão</option>
+                    <option value="ESPECIAL">Especial</option>
+                `;
+
+                const tipoNormalizado = (filho.tipo === 'ESPECIAL_SEM_IDADE') ? 'ESPECIAL' : (filho.tipo || 'PADRAO');
+                select.value = (tipoNormalizado === 'NENHUM') ? 'PADRAO' : tipoNormalizado;
+                select.onchange = () => calcularComparacao();
+
+                const botaoRemover = document.createElement('button');
+                botaoRemover.type = 'button';
+                botaoRemover.className = 'btn-remover-creche';
+                botaoRemover.textContent = 'Remover';
+                botaoRemover.onclick = () => removerFilhoCrecheComparacao(codigo, index);
+
+                controls.appendChild(select);
+                controls.appendChild(botaoRemover);
+
+                item.appendChild(label);
+                item.appendChild(controls);
+                lista.appendChild(item);
+            });
+        }
+
+        function adicionarFilhoCrecheComparacao(codigo) {
+            const atual = obterFilhosCrecheComparacao(codigo);
+            atual.push({ tipo: 'PADRAO', idadeInicial: 0 });
+            renderizarListaFilhosCrecheComparacao(codigo, atual);
+            calcularComparacao();
+        }
+
+        function removerFilhoCrecheComparacao(codigo, index) {
+            const atual = obterFilhosCrecheComparacao(codigo);
+            atual.splice(index, 1);
+            renderizarListaFilhosCrecheComparacao(codigo, atual);
+            calcularComparacao();
+        }
+
+        function atualizarCamposFilhosComparacao(codigo) {
+            const container = document.getElementById(`comparacao-coluna-${codigo}`);
+            if (!container) return;
+
+            container.querySelectorAll('.comparacao-creche-list .filho-creche-item').forEach((item) => {
+                const selectTipo = item.querySelector('select');
+                if (selectTipo) {
+                    selectTipo.value = (selectTipo.value === 'ESPECIAL_SEM_IDADE') ? 'ESPECIAL' : selectTipo.value;
+                }
+            });
+        }
+
+        function obterFilhosCrecheComparacao(codigo) {
+            const container = document.getElementById(`comparacao-coluna-${codigo}`);
+            if (!container) return [];
+
+            const filhos = [];
+            container.querySelectorAll('.comparacao-creche-list .filho-creche-item').forEach((item) => {
+                const selectTipo = item.querySelector('select');
+                if (!selectTipo) return;
+                const tipo = (selectTipo.value === 'ESPECIAL_SEM_IDADE') ? 'ESPECIAL' : (selectTipo.value || 'PADRAO');
+                filhos.push({
+                    tipo,
+                    idadeInicial: 0
+                });
+            });
+            return filhos;
+        }
+
+        function coletarParametrosComparacao(codigo) {
+            const input = (key) => document.getElementById(`comp-${codigo}-${key}`);
+            return {
+                anoInicial: Number(input('anoInicial').value) || 1,
+                pontosADE: Math.min(100, Math.max(0, Number(input('pontosADE').value) || 0)),
+                avancoTitulacao: Number(input('avancoTitulacao').value) || 0,
+                funcaoGratificada: input('funcaoGratificada').value,
+                correcaoInflacao: Number(input('correcaoInflacao').value) || 0,
+                regimePrevidencia: input('regimePrevidencia').value,
+                aliquotaPrevcom: Number(input('aliquotaPrevcom').value) || 0,
+                qtdDependentesIRPF: Number(input('qtdDependentesIRPF').value) || 0,
+                decimoTerceiroSalario: input('decimoTerceiroSalario').value,
+                outrasVerbasIndenizatorias: Math.max(0, Number(input('outrasVerbasIndenizatorias').value) || 0),
+                feriasDias: Number(input('feriasDias').value) || 0,
+                associadoAsscontas: input('associadoAsscontas').checked,
+                associadoAudtce: input('associadoAudtce').checked,
+                incideAdePrev: input('incideAdePrev').checked,
+                incideFuncaoPrev: input('incideFuncaoPrev').checked,
+                outrosDescontos: Math.max(0, Number(input('outrosDescontos').value) || 0),
+                filhosCreche: obterFilhosCrecheComparacao(codigo)
+            };
+        }
+
+        function calcularCenarioMensal(parametros) {
+            const padraoEfetivo = Math.min(CONSTANTES.PADRAO_MAXIMO, (PADROES_BASE_CARREIRA[Math.max(0, (parametros.anoInicial - 1))]?.padraoBase ?? 59) + parametros.avancoTitulacao);
+            const vencimentoBase = TABELA_VENCIMENTOS[padraoEfetivo] || 0.0;
+            const pctInflacao = (parametros.correcaoInflacao || 0) / 100.0;
+            const vencimentoBaseCorrigido = vencimentoBase * (1 + pctInflacao);
+            const valorADE = (parametros.pontosADE || 0) * CONSTANTES.VALOR_PONTO_ADE_NS * (1 + pctInflacao);
+            const valorFG = (FUNCOES_GRATIFICADAS[parametros.funcaoGratificada] || 0.0) * (1 + pctInflacao);
+            const valorAuxCreche = calcularAuxilioCrecheAno(parametros.filhosCreche || [], 1);
+            const valorFerias = parametros.feriasDias > 0 ? ((vencimentoBaseCorrigido + valorADE + valorFG) / (22 * 3)) * parametros.feriasDias : 0.0;
+            const remuneracaoBruta = vencimentoBaseCorrigido + valorADE + valorFG + CONSTANTES.AUXILIO_ALIMENTACAO + CONSTANTES.AUXILIO_SAUDE + parametros.outrasVerbasIndenizatorias + valorAuxCreche + valorFerias;
+            const tetoConstitucional = CONSTANTES.TETO_CONSTITUCIONAL;
+            const remunSujeitaTeto = vencimentoBaseCorrigido + valorADE + valorFG;
+            const abateTeto = Math.max(0.0, remunSujeitaTeto - tetoConstitucional);
+            const remunEfetivaTributavel = remunSujeitaTeto - abateTeto;
+
+            let basePrevidencia = vencimentoBaseCorrigido * (remunEfetivaTributavel > 0 ? (remunEfetivaTributavel / remunSujeitaTeto || 1) : 1);
+            if (parametros.incideAdePrev) basePrevidencia += valorADE;
+            if (parametros.incideFuncaoPrev) basePrevidencia += valorFG;
+            basePrevidencia = Math.max(0, basePrevidencia);
+
+            let descPrevidencia = 0.0;
+            if (parametros.regimePrevidencia === 'ANTIGO_RPPS') {
+                descPrevidencia = Math.max(0.0, (basePrevidencia * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS);
+            } else if (basePrevidencia >= CONSTANTES.TETO_RGPS) {
+                descPrevidencia = CONSTANTES.DESCONTO_RPPS_INSS_TETO;
+            } else {
+                descPrevidencia = Math.max(0.0, (basePrevidencia * CONSTANTES.ALIQUOTA_RPPS_INTEGRAL) - CONSTANTES.PARCELA_DEDUZIR_RPPS);
+            }
+
+            let descPrevcom = 0.0;
+            if (parametros.regimePrevidencia === 'NOVO_PREVCOM') {
+                const basePrevcom = Math.max(0.0, remunEfetivaTributavel - CONSTANTES.TETO_RGPS);
+                const aliquotaPrevcomDecimal = (Number(parametros.aliquotaPrevcom) || 0) / 100.0;
+                descPrevcom = basePrevcom * aliquotaPrevcomDecimal;
+            }
+
+            const deducaoDependentesTotal = parametros.qtdDependentesIRPF * CONSTANTES.DEDUCAO_DEPENDENTE_IRPF;
+            const baseIRPF = Math.max(0.0, remunEfetivaTributavel - descPrevidencia - descPrevcom - deducaoDependentesTotal);
+            const descIRPF = Math.max(0.0, (baseIRPF * CONSTANTES.ALIQUOTA_MAX_IRPF) - CONSTANTES.PARCELA_DEDUZIR_IRPF);
+            const impostoFerias = valorFerias * CONSTANTES.ALIQUOTA_MAX_IRPF;
+            const descAsscontas = parametros.associadoAsscontas ? CONSTANTES.MENSALIDADE_ASSCONTAS : 0.0;
+            const descAudtce = parametros.associadoAudtce ? CONSTANTES.DESCONTO_AUDTCE_MG : 0.0;
+            const descOutros = Math.max(0, parametros.outrosDescontos || 0);
+            const totalDescontos = descPrevidencia + descPrevcom + descIRPF + impostoFerias + abateTeto + descAsscontas + descAudtce + descOutros;
+            const remuneracaoLiquida = remuneracaoBruta - totalDescontos;
+            const valorDecimo = (parametros.decimoTerceiroSalario === 'PRIMEIRA') ? ((remunSujeitaTeto / 2.0)) : ((parametros.decimoTerceiroSalario === 'SEGUNDA') ? (Math.max(0.0, remunSujeitaTeto - abateTeto - descPrevidencia - descPrevcom - descIRPF - (remunSujeitaTeto / 2.0))) : 0.0);
+
+            return {
+                padraoEfetivo,
+                vencimentoBase: vencimentoBaseCorrigido,
+                valorADE,
+                valorFG,
+                valorFerias,
+                valorAuxCreche,
+                auxAlimentacao: CONSTANTES.AUXILIO_ALIMENTACAO,
+                auxSaude: CONSTANTES.AUXILIO_SAUDE,
+                outrasVerbasIndenizatorias: parametros.outrasVerbasIndenizatorias,
+                remuneracaoBruta,
+                abateTeto,
+                descPrevidencia,
+                descPrevcom,
+                descIRPF,
+                impostoFerias,
+                descAsscontas,
+                descAudtce,
+                descOutros,
+                totalDescontos,
+                remuneracaoLiquida,
+                valorDecimo,
+                somaRemuneracaoLiquida: remuneracaoLiquida + valorDecimo
+            };
+        }
+
+        function calcularComparacao() {
+            const parametrosA = coletarParametrosComparacao('a');
+            const parametrosB = coletarParametrosComparacao('b');
+            const cenarioA = calcularCenarioMensal(parametrosA);
+            const cenarioB = calcularCenarioMensal(parametrosB);
+
+            document.getElementById('comparacao-liquido-a').textContent = formatarMoeda(cenarioA.remuneracaoLiquida);
+            document.getElementById('comparacao-liquido-b').textContent = formatarMoeda(cenarioB.remuneracaoLiquida);
+
+            const linhas = [
+                ['Vencimento Base', cenarioA.vencimentoBase, cenarioB.vencimentoBase],
+                ['ADE', cenarioA.valorADE, cenarioB.valorADE],
+                ['Função Gratificada', cenarioA.valorFG, cenarioB.valorFG],
+                ['Auxílio Alimentação', cenarioA.auxAlimentacao, cenarioB.auxAlimentacao],
+                ['Auxílio Saúde', cenarioA.auxSaude, cenarioB.auxSaude],
+                ['Auxílio Creche', cenarioA.valorAuxCreche, cenarioB.valorAuxCreche],
+                ['Outras Verbas', cenarioA.outrasVerbasIndenizatorias, cenarioB.outrasVerbasIndenizatorias],
+                ['Remuneração Bruta', cenarioA.remuneracaoBruta, cenarioB.remuneracaoBruta],
+                ['Abate-Teto', cenarioA.abateTeto, cenarioB.abateTeto],
+                ['Desc. Previdência', cenarioA.descPrevidencia, cenarioB.descPrevidencia],
+                ['Desc. Prevcom', cenarioA.descPrevcom, cenarioB.descPrevcom],
+                ['Desc. IRPF', cenarioA.descIRPF, cenarioB.descIRPF],
+                ['ASSCONTAS', cenarioA.descAsscontas, cenarioB.descAsscontas],
+                ['AudTCE-MG', cenarioA.descAudtce, cenarioB.descAudtce],
+                ['Outros Descontos', cenarioA.descOutros, cenarioB.descOutros],
+                ['Total de Descontos', cenarioA.totalDescontos, cenarioB.totalDescontos],
+                ['Remuneração Líquida', cenarioA.remuneracaoLiquida, cenarioB.remuneracaoLiquida],
+                ['13º Salário (Líq.)', cenarioA.valorDecimo, cenarioB.valorDecimo],
+                ['Diferença Líquida', cenarioB.remuneracaoLiquida - cenarioA.remuneracaoLiquida, cenarioA.remuneracaoLiquida - cenarioB.remuneracaoLiquida]
+            ];
+
+            const tbody = document.getElementById('comparacao-tabela-corpo');
+            tbody.innerHTML = '';
+            linhas.forEach(([label, valorA, valorB]) => {
+                const tr = document.createElement('tr');
+                if (label === 'Diferença Líquida') {
+                    tr.classList.add('diff-row');
+                }
+                const valorAFormatado = formatarMoeda(valorA);
+                const valorBFormatado = formatarMoeda(valorB);
+                tr.innerHTML = `
+                    <td>${label}</td>
+                    <td>${valorAFormatado}</td>
+                    <td>${valorBFormatado}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const diferencaLiquida = cenarioB.remuneracaoLiquida - cenarioA.remuneracaoLiquida;
+            const linhaResumo = document.createElement('tr');
+            linhaResumo.classList.add('total-row');
+            linhaResumo.innerHTML = `
+                <td>Diferença no Salário Líquido</td>
+                <td colspan="2">${diferencaLiquida >= 0 ? '+' : ''}${formatarMoeda(diferencaLiquida)} (${diferencaLiquida >= 0 ? 'B vence A' : 'A vence B'})</td>
+            `;
+            tbody.appendChild(linhaResumo);
+
+            localStorage.setItem(CHAVE_STORAGE_COMPARACAO, JSON.stringify({
+                a: parametrosA,
+                b: parametrosB
+            }));
         }
 
         function salvarEstado() {
@@ -822,6 +1438,7 @@
             }));
 
             const estado = {
+                modo: obterModoAtual(),
                 anoInicial: document.getElementById('anoInicial').value,
                 pontosADE: document.getElementById('pontosADE').value,
                 avancoTitulacao: document.getElementById('avancoTitulacao').value,
@@ -838,10 +1455,15 @@
                 associadoAudtce: document.getElementById('associadoAudtce').checked,
                 incideAdePrev: document.getElementById('incideAdePrev').checked,
                 incideFuncaoPrev: document.getElementById('incideFuncaoPrev').checked,
-                outrosDescontos: document.getElementById('outrosDescontos').value
+                outrosDescontos: document.getElementById('outrosDescontos').value,
+                comparacao: {
+                    a: coletarParametrosComparacao('a'),
+                    b: coletarParametrosComparacao('b')
+                }
             };
             try {
                 localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estado));
+                localStorage.setItem(CHAVE_STORAGE_COMPARACAO, JSON.stringify(estado.comparacao));
             } catch (e) {
                 console.warn("localStorage inacessível:", e);
             }
@@ -852,6 +1474,9 @@
                 const salvo = localStorage.getItem(CHAVE_STORAGE);
                 if (salvo) {
                     const estado = JSON.parse(salvo);
+                    if (estado.modo === 'comparacao' || estado.modo === 'carreira') {
+                        localStorage.setItem(CHAVE_STORAGE_MODO, estado.modo);
+                    }
                     if (estado.anoInicial !== undefined) document.getElementById('anoInicial').value = estado.anoInicial;
                     if (estado.pontosADE !== undefined) document.getElementById('pontosADE').value = estado.pontosADE;
                     if (estado.avancoTitulacao !== undefined) document.getElementById('avancoTitulacao').value = estado.avancoTitulacao;
@@ -871,6 +1496,36 @@
                     if (estado.filhosCreche && Array.isArray(estado.filhosCreche)) {
                         renderizarListaFilhosCreche(estado.filhosCreche);
                     }
+                    if (estado.comparacao && estado.comparacao.a && estado.comparacao.b) {
+                        Object.entries(estado.comparacao.a).forEach(([key, value]) => {
+                            const input = document.getElementById(`comp-a-${key}`);
+                            if (!input) return;
+                            if (input.type === 'checkbox') input.checked = Boolean(value);
+                            else {
+                                let valorFinal = String(value);
+                                if (key === 'aliquotaPrevcom' && Number(value) <= 1) {
+                                    let valorPercentual = Number(value) * 100;
+                                    if (valorPercentual < 1) valorPercentual *= 100;
+                                    valorFinal = String(valorPercentual);
+                                }
+                                input.value = valorFinal;
+                            }
+                        });
+                        Object.entries(estado.comparacao.b).forEach(([key, value]) => {
+                            const input = document.getElementById(`comp-b-${key}`);
+                            if (!input) return;
+                            if (input.type === 'checkbox') input.checked = Boolean(value);
+                            else {
+                                let valorFinal = String(value);
+                                if (key === 'aliquotaPrevcom' && Number(value) <= 1) {
+                                    let valorPercentual = Number(value) * 100;
+                                    if (valorPercentual < 1) valorPercentual *= 100;
+                                    valorFinal = String(valorPercentual);
+                                }
+                                input.value = valorFinal;
+                            }
+                        });
+                    }
                 }
             } catch (e) {
                 console.warn("Erro ao ler estado do localStorage:", e);
@@ -888,6 +1543,8 @@
                 selectAno.appendChild(opt);
             }
             selectAno.value = "1";
+
+            construirCamposComparacao();
 
             document.getElementById('c_pontoADE').innerText = formatarMoeda(CONSTANTES.VALOR_PONTO_ADE_NS);
             document.getElementById('c_auxAlimentacao').innerText = formatarMoeda(CONSTANTES.AUXILIO_ALIMENTACAO);
@@ -915,7 +1572,9 @@
 
             renderizarListaFilhosCreche();
             carregarEstado();
+            atualizarModoVisual();
             calcularSimulacao();
+            calcularComparacao();
             atualizarBotaoTema();
         }
 
@@ -1110,6 +1769,11 @@
         }
 
         function calcularSimulacao() {
+            if (obterModoAtual() === 'comparacao') {
+                calcularComparacao();
+                return;
+            }
+
             atualizarCamposFilhos();
             const anoInicial = parseInt(document.getElementById('anoInicial').value) || 1;
             const pontosADE = Math.min(100, Math.max(0, parseFloat(document.getElementById('pontosADE').value) || 0));
