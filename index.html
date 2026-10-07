@@ -671,7 +671,6 @@
             <div class="constante-item"><span>Dedução IRPF por Dependente:</span><strong id="c_deducaoDepIRPF"></strong></div>
             <div class="constante-item"><span>Teto RGPS / Desconto RPPS Teto:</span><strong id="c_tetoRGPS"></strong></div>
             <div class="constante-item"><span>Mensalidade ASSCONTAS:</span><strong id="c_asscontas"></strong></div>
-            <div class="constante-item"><span>Taxa Desconto em Folha (SERPRO):</span><strong id="c_serpro"></strong></div>
             <div class="constante-item"><span>Mensalidade AudTCE-MG:</span><strong id="c_audtce"></strong></div>
         </div>
     </div>
@@ -733,8 +732,7 @@
             PARCELA_DEDUZIR_IRPF: 908.73,
             ALIQUOTA_RPPS_INTEGRAL: 0.16,
             PARCELA_DEDUZIR_RPPS: 247.32,
-            MENSALIDADE_ASSCONTAS: 26.48,
-            TAXA_SERPRO: 3.08,
+            MENSALIDADE_ASSCONTAS: 32.46,
             DESCONTO_AUDTCE_MG: 75.00,
             TETO_CONSTITUCIONAL: 46366.19
         };
@@ -902,7 +900,6 @@
             document.getElementById('c_deducaoDepIRPF').innerText = formatarMoeda(CONSTANTES.DEDUCAO_DEPENDENTE_IRPF);
             document.getElementById('c_tetoRGPS').innerText = `${formatarMoeda(CONSTANTES.TETO_RGPS)} (${formatarMoeda(CONSTANTES.DESCONTO_RPPS_INSS_TETO)})`;
             document.getElementById('c_asscontas').innerText = formatarMoeda(CONSTANTES.MENSALIDADE_ASSCONTAS);
-            document.getElementById('c_serpro').innerText = formatarMoeda(CONSTANTES.TAXA_SERPRO);
             document.getElementById('c_audtce').innerText = formatarMoeda(CONSTANTES.DESCONTO_AUDTCE_MG);
             document.getElementById('c_tetoConstitucional').innerText = formatarMoeda(CONSTANTES.TETO_CONSTITUCIONAL);
 
@@ -1210,7 +1207,7 @@
 
                 const eAssociado = document.getElementById('associadoAsscontas').checked;
                 const eAssociadoAudtce = document.getElementById('associadoAudtce').checked;
-                const descAsscontas = eAssociado ? CONSTANTES.MENSALIDADE_ASSCONTAS + CONSTANTES.TAXA_SERPRO : 0.0;
+                const descAsscontas = eAssociado ? CONSTANTES.MENSALIDADE_ASSCONTAS : 0.0;
                 const descAudtce = eAssociadoAudtce ? CONSTANTES.DESCONTO_AUDTCE_MG : 0.0;
                 const descOutros = Math.max(0.0, parseFloat(document.getElementById('outrosDescontos').value) || 0.0);
 
