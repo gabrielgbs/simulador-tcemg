@@ -137,8 +137,10 @@
             border: 1px solid var(--border-color);
             border-radius: 999px;
             background: var(--bg-light);
-            margin: 0 auto 20px auto;
+            margin: 0;
             width: fit-content;
+            height: 38px;
+            box-sizing: border-box;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
@@ -148,9 +150,13 @@
             color: var(--text-muted);
             font-weight: 700;
             border-radius: 999px;
-            padding: 8px 16px;
+            padding: 0 16px;
             cursor: pointer;
             transition: all 0.2s ease;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .mode-btn.active {
@@ -447,6 +453,41 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
+        .comparison-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            grid-column: 1 / -1;
+            justify-self: center;
+            align-self: start;
+            margin: 0 auto 18px;
+            max-width: 760px;
+            width: 100%;
+        }
+
+        .comparison-action-btn {
+            border: 1px solid var(--primary-color);
+            background: var(--card-bg);
+            color: var(--primary-color);
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comparison-action-btn:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
         .comparison-column {
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -478,7 +519,7 @@
 
         .comparison-summary {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 10px;
             margin-top: 15px;
         }
@@ -488,6 +529,11 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 14px;
+        }
+
+        .comparison-result-box.destaque-diferenca {
+            background: var(--output-bg);
+            border-color: rgba(35, 120, 70, 0.45);
         }
 
         .comparison-result-box .label {
@@ -503,6 +549,10 @@
             font-size: 1.2em;
             font-weight: 700;
             color: var(--primary-color);
+        }
+
+        .comparison-result-box.destaque-diferenca .value {
+            color: var(--color-liquido-text);
         }
 
         .comparison-table {
@@ -613,29 +663,30 @@
                 </a>
             </div>
         </div>
-        <button id="themeToggleBtn" class="theme-toggle-btn" type="button" onclick="alternarTemaManual()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
-            <!-- Ícone de Sol (ativo quando tema for dark, indicando ação para ir ao claro) -->
-            <svg id="iconSun" class="theme-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <!-- Ícone de Lua (ativo quando tema for light, indicando ação para ir ao escuro) -->
-            <svg id="iconMoon" class="theme-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </button>
-    </div>
-
-    <div class="mode-toggle" aria-label="Modo do simulador">
-        <button type="button" class="mode-btn active" data-modo="carreira" onclick="alternarModo('carreira')">Carreira</button>
-        <button type="button" class="mode-btn" data-modo="comparacao" onclick="alternarModo('comparacao')">Comparação</button>
+        <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+            <div class="mode-toggle" aria-label="Modo do simulador">
+                <button type="button" class="mode-btn active" data-modo="carreira" onclick="alternarModo('carreira')">Carreira</button>
+                <button type="button" class="mode-btn" data-modo="comparacao" onclick="alternarModo('comparacao')">Comparação</button>
+            </div>
+            <button id="themeToggleBtn" class="theme-toggle-btn" type="button" onclick="alternarTemaManual()" title="Alternar tema claro/escuro" aria-label="Alternar tema claro/escuro">
+                <!-- Ícone de Sol (ativo quando tema for dark, indicando ação para ir ao claro) -->
+                <svg id="iconSun" class="theme-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <!-- Ícone de Lua (ativo quando tema for light, indicando ação para ir ao escuro) -->
+                <svg id="iconMoon" class="theme-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <!-- Painel de Parâmetros -->
@@ -774,6 +825,11 @@
             <h4>Cenário B</h4>
             <div class="comparison-grid" id="comparacao-coluna-b"></div>
         </div>
+        <div class="comparison-actions">
+            <button type="button" class="comparison-action-btn" onclick="copiarParametrosComparacao('a', 'b')">Copiar A → B</button>
+            <button type="button" class="comparison-action-btn" onclick="copiarParametrosComparacao('b', 'a')">Copiar B → A</button>
+            <button type="button" class="comparison-action-btn" onclick="trocarParametrosComparacao()">Trocar A ↔ B</button>
+        </div>
     </div>
 
     <!-- Tabela Principal de Simulação -->
@@ -820,6 +876,10 @@
             <div class="comparison-result-box">
                 <span class="label">Salário líquido — Cenário B</span>
                 <span id="comparacao-liquido-b" class="value">R$ 0,00</span>
+            </div>
+            <div class="comparison-result-box destaque-diferenca">
+                <span class="label">Diferença líquida</span>
+                <span id="comparacao-diferenca-liquida" class="value">R$ 0,00</span>
             </div>
         </div>
         <table class="comparison-table">
@@ -1002,7 +1062,14 @@
 
         function alternarModo(modo) {
             localStorage.setItem(CHAVE_STORAGE_MODO, modo);
+            const estadoSalvo = JSON.parse(localStorage.getItem(CHAVE_STORAGE) || '{}');
+            estadoSalvo.modo = modo;
+            localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estadoSalvo));
             atualizarModoVisual();
+
+            if (modo === 'carreira') {
+                calcularSimulacao();
+            }
             if (modo === 'comparacao') {
                 calcularComparacao();
             }
@@ -1019,6 +1086,28 @@
             document.getElementById('carreira-table-container').style.display = emCarreira ? 'block' : 'none';
             document.getElementById('panel-comparacao').classList.toggle('active', !emCarreira);
             document.getElementById('comparacao-results').classList.toggle('active', !emCarreira);
+        }
+
+        function persistirEstadoComparacao() {
+            const modoAtual = obterModoAtual();
+            const comparacao = {
+                a: coletarParametrosComparacao('a'),
+                b: coletarParametrosComparacao('b')
+            };
+
+            try {
+                const estadoSalvo = JSON.parse(localStorage.getItem(CHAVE_STORAGE) || '{}');
+                const estadoAtualizado = {
+                    ...estadoSalvo,
+                    modo: modoAtual,
+                    comparacao
+                };
+                localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estadoAtualizado));
+                localStorage.setItem(CHAVE_STORAGE_MODO, modoAtual);
+                localStorage.setItem(CHAVE_STORAGE_COMPARACAO, JSON.stringify(comparacao));
+            } catch (e) {
+                console.warn("localStorage inacessível ao persistir modo/comparação:", e);
+            }
         }
 
         function formatarMoeda(valor) {
@@ -1057,7 +1146,7 @@
                 container.innerHTML = '';
 
                 const campos = [
-                    { key: 'anoInicial', label: 'Ano Atual na Carreira:', type: 'select', options: Array.from({ length: 17 }, (_, i) => ({ value: i + 1, label: `${i + 1}º Ano` })) },
+                    { key: 'padraoAtual', label: 'Padrão atual na carreira:', type: 'number', min: 59, max: 94, step: 1, value: 59 },
                     { key: 'pontosADE', label: 'Pontos de ADE (0 a 100):', type: 'number', min: 0, max: 100, value: 100 },
                     { key: 'avancoTitulacao', label: 'Avanço por Titulação:', type: 'select', options: [
                         { value: 0, label: 'Nenhuma (0 padrões)' },
@@ -1150,8 +1239,8 @@
             });
 
             const valoresPadrao = {
-                a: { anoInicial: 1, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
-                b: { anoInicial: 5, pontosADE: 60, avancoTitulacao: 2, funcaoGratificada: 'FG-1', correcaoInflacao: 3, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 1, decimoTerceiroSalario: 'SEGUNDA', outrasVerbasIndenizatorias: 250, feriasDias: 15, associadoAsscontas: false, associadoAudtce: true, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 100 }
+                a: { padraoAtual: 59, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
+                b: { padraoAtual: 68, pontosADE: 60, avancoTitulacao: 2, funcaoGratificada: 'FG-1', correcaoInflacao: 3, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 1, decimoTerceiroSalario: 'SEGUNDA', outrasVerbasIndenizatorias: 250, feriasDias: 15, associadoAsscontas: false, associadoAudtce: true, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 100 }
             };
 
             Object.keys(valoresPadrao).forEach((codigo) => {
@@ -1166,6 +1255,63 @@
                 });
                 renderizarListaFilhosCrecheComparacao(codigo, [{ tipo: 'PADRAO', idadeInicial: 0 }]);
             });
+        }
+
+        function copiarParametrosComparacao(origem, destino) {
+            if (origem === destino) return;
+
+            const campos = [
+                'padraoAtual', 'pontosADE', 'avancoTitulacao', 'funcaoGratificada', 'correcaoInflacao',
+                'regimePrevidencia', 'aliquotaPrevcom', 'incideAdePrev', 'incideFuncaoPrev',
+                'qtdDependentesIRPF', 'decimoTerceiroSalario', 'outrasVerbasIndenizatorias',
+                'feriasDias', 'associadoAsscontas', 'associadoAudtce', 'outrosDescontos'
+            ];
+
+            campos.forEach((campo) => {
+                const origemInput = document.getElementById(`comp-${origem}-${campo}`);
+                const destinoInput = document.getElementById(`comp-${destino}-${campo}`);
+                if (!origemInput || !destinoInput) return;
+                if (origemInput.type === 'checkbox') {
+                    destinoInput.checked = origemInput.checked;
+                } else {
+                    destinoInput.value = origemInput.value;
+                }
+            });
+
+            const filhosOrigem = obterFilhosCrecheComparacao(origem);
+            renderizarListaFilhosCrecheComparacao(destino, filhosOrigem);
+            calcularComparacao();
+        }
+
+        function trocarParametrosComparacao() {
+            const filhosAOriginais = obterFilhosCrecheComparacao('a');
+            const filhosBOriginais = obterFilhosCrecheComparacao('b');
+
+            const campos = [
+                'padraoAtual', 'pontosADE', 'avancoTitulacao', 'funcaoGratificada', 'correcaoInflacao',
+                'regimePrevidencia', 'aliquotaPrevcom', 'incideAdePrev', 'incideFuncaoPrev',
+                'qtdDependentesIRPF', 'decimoTerceiroSalario', 'outrasVerbasIndenizatorias',
+                'feriasDias', 'associadoAsscontas', 'associadoAudtce', 'outrosDescontos'
+            ];
+
+            campos.forEach((campo) => {
+                const inputA = document.getElementById(`comp-a-${campo}`);
+                const inputB = document.getElementById(`comp-b-${campo}`);
+                if (!inputA || !inputB) return;
+                const valorA = inputA.type === 'checkbox' ? inputA.checked : inputA.value;
+                const valorB = inputB.type === 'checkbox' ? inputB.checked : inputB.value;
+                if (inputA.type === 'checkbox') {
+                    inputA.checked = valorB;
+                    inputB.checked = valorA;
+                } else {
+                    inputA.value = valorB;
+                    inputB.value = valorA;
+                }
+            });
+
+            renderizarListaFilhosCrecheComparacao('a', filhosBOriginais);
+            renderizarListaFilhosCrecheComparacao('b', filhosAOriginais);
+            calcularComparacao();
         }
 
         function renderizarListaFilhosCrecheComparacao(codigo, filhos = []) {
@@ -1274,8 +1420,9 @@
 
         function coletarParametrosComparacao(codigo) {
             const input = (key) => document.getElementById(`comp-${codigo}-${key}`);
+            const padraoAtual = Math.min(94, Math.max(59, Number(input('padraoAtual').value) || 59));
             return {
-                anoInicial: Number(input('anoInicial').value) || 1,
+                padraoAtual,
                 pontosADE: Math.min(100, Math.max(0, Number(input('pontosADE').value) || 0)),
                 avancoTitulacao: Number(input('avancoTitulacao').value) || 0,
                 funcaoGratificada: input('funcaoGratificada').value,
@@ -1296,7 +1443,8 @@
         }
 
         function calcularCenarioMensal(parametros) {
-            const padraoEfetivo = Math.min(CONSTANTES.PADRAO_MAXIMO, (PADROES_BASE_CARREIRA[Math.max(0, (parametros.anoInicial - 1))]?.padraoBase ?? 59) + parametros.avancoTitulacao);
+            const padraoAtual = Math.min(CONSTANTES.PADRAO_MAXIMO, Math.max(59, Number(parametros.padraoAtual) || 59));
+            const padraoEfetivo = Math.min(CONSTANTES.PADRAO_MAXIMO, padraoAtual + (Number(parametros.avancoTitulacao) || 0));
             const vencimentoBase = TABELA_VENCIMENTOS[padraoEfetivo] || 0.0;
             const pctInflacao = (parametros.correcaoInflacao || 0) / 100.0;
             const vencimentoBaseCorrigido = vencimentoBase * (1 + pctInflacao);
@@ -1377,6 +1525,12 @@
             document.getElementById('comparacao-liquido-a').textContent = formatarMoeda(cenarioA.remuneracaoLiquida);
             document.getElementById('comparacao-liquido-b').textContent = formatarMoeda(cenarioB.remuneracaoLiquida);
 
+            const diferencaLiquida = cenarioB.remuneracaoLiquida - cenarioA.remuneracaoLiquida;
+            const ehEmpate = Math.abs(diferencaLiquida) < 0.01;
+            const valorDiferenca = ehEmpate ? 0 : diferencaLiquida;
+            const textoResultado = ehEmpate ? 'empate' : (valorDiferenca > 0 ? 'B vence A' : 'A vence B');
+            document.getElementById('comparacao-diferenca-liquida').textContent = `${valorDiferenca === 0 ? '' : (valorDiferenca > 0 ? '+' : '-')}${valorDiferenca === 0 ? formatarMoeda(0) : formatarMoeda(Math.abs(valorDiferenca))} (${textoResultado})`;
+
             const linhas = [
                 ['Vencimento Base', cenarioA.vencimentoBase, cenarioB.vencimentoBase],
                 ['ADE', cenarioA.valorADE, cenarioB.valorADE],
@@ -1416,12 +1570,12 @@
                 tbody.appendChild(tr);
             });
 
-            const diferencaLiquida = cenarioB.remuneracaoLiquida - cenarioA.remuneracaoLiquida;
             const linhaResumo = document.createElement('tr');
             linhaResumo.classList.add('total-row');
+            const textoResultadoTabela = ehEmpate ? 'empate' : (valorDiferenca > 0 ? 'B vence A' : 'A vence B');
             linhaResumo.innerHTML = `
                 <td>Diferença no Salário Líquido</td>
-                <td colspan="2">${diferencaLiquida >= 0 ? '+' : ''}${formatarMoeda(diferencaLiquida)} (${diferencaLiquida >= 0 ? 'B vence A' : 'A vence B'})</td>
+                <td colspan="2">${valorDiferenca === 0 ? formatarMoeda(0) : `${valorDiferenca > 0 ? '+' : '-'}${formatarMoeda(Math.abs(valorDiferenca))}`} (${textoResultadoTabela})</td>
             `;
             tbody.appendChild(linhaResumo);
 
@@ -1429,6 +1583,7 @@
                 a: parametrosA,
                 b: parametrosB
             }));
+            persistirEstadoComparacao();
         }
 
         function salvarEstado() {
@@ -1463,6 +1618,7 @@
             };
             try {
                 localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estado));
+                localStorage.setItem(CHAVE_STORAGE_MODO, estado.modo);
                 localStorage.setItem(CHAVE_STORAGE_COMPARACAO, JSON.stringify(estado.comparacao));
             } catch (e) {
                 console.warn("localStorage inacessível:", e);
@@ -1471,12 +1627,17 @@
 
         function carregarEstado() {
             try {
+                const modoPersistido = localStorage.getItem(CHAVE_STORAGE_MODO);
+                if (modoPersistido === 'carreira' || modoPersistido === 'comparacao') {
+                    localStorage.setItem(CHAVE_STORAGE_MODO, modoPersistido);
+                }
+
                 const salvo = localStorage.getItem(CHAVE_STORAGE);
                 if (salvo) {
                     const estado = JSON.parse(salvo);
-                    if (estado.modo === 'comparacao' || estado.modo === 'carreira') {
-                        localStorage.setItem(CHAVE_STORAGE_MODO, estado.modo);
-                    }
+                    const modoFinal = (modoPersistido === 'comparacao' || modoPersistido === 'carreira') ? modoPersistido : (estado.modo === 'comparacao' || estado.modo === 'carreira' ? estado.modo : 'carreira');
+                    localStorage.setItem(CHAVE_STORAGE_MODO, modoFinal);
+
                     if (estado.anoInicial !== undefined) document.getElementById('anoInicial').value = estado.anoInicial;
                     if (estado.pontosADE !== undefined) document.getElementById('pontosADE').value = estado.pontosADE;
                     if (estado.avancoTitulacao !== undefined) document.getElementById('avancoTitulacao').value = estado.avancoTitulacao;
@@ -1496,13 +1657,25 @@
                     if (estado.filhosCreche && Array.isArray(estado.filhosCreche)) {
                         renderizarListaFilhosCreche(estado.filhosCreche);
                     }
-                    if (estado.comparacao && estado.comparacao.a && estado.comparacao.b) {
-                        Object.entries(estado.comparacao.a).forEach(([key, value]) => {
-                            const input = document.getElementById(`comp-a-${key}`);
+
+                    const comparacaoPersistida = localStorage.getItem(CHAVE_STORAGE_COMPARACAO);
+                    const comparacaoEscolhida = (estado.comparacao && estado.comparacao.a && estado.comparacao.b) ? estado.comparacao : (comparacaoPersistida ? JSON.parse(comparacaoPersistida) : null);
+                    if (comparacaoEscolhida && comparacaoEscolhida.a && comparacaoEscolhida.b) {
+                        const filhosA = Array.isArray(comparacaoEscolhida.a.filhosCreche) && comparacaoEscolhida.a.filhosCreche.length > 0 ? comparacaoEscolhida.a.filhosCreche : [{ tipo: 'PADRAO', idadeInicial: 0 }];
+                        const filhosB = Array.isArray(comparacaoEscolhida.b.filhosCreche) && comparacaoEscolhida.b.filhosCreche.length > 0 ? comparacaoEscolhida.b.filhosCreche : [{ tipo: 'PADRAO', idadeInicial: 0 }];
+                        renderizarListaFilhosCrecheComparacao('a', filhosA);
+                        renderizarListaFilhosCrecheComparacao('b', filhosB);
+
+                        Object.entries(comparacaoEscolhida.a).forEach(([key, value]) => {
+                            const inputKey = key === 'anoInicial' ? 'padraoAtual' : key;
+                            const input = document.getElementById(`comp-a-${inputKey}`);
                             if (!input) return;
                             if (input.type === 'checkbox') input.checked = Boolean(value);
                             else {
                                 let valorFinal = String(value);
+                                if (inputKey === 'padraoAtual' && Number(value) >= 1 && Number(value) <= 17) {
+                                    valorFinal = String(Math.min(94, Math.max(59, Number(value) + 58)));
+                                }
                                 if (key === 'aliquotaPrevcom' && Number(value) <= 1) {
                                     let valorPercentual = Number(value) * 100;
                                     if (valorPercentual < 1) valorPercentual *= 100;
@@ -1511,12 +1684,16 @@
                                 input.value = valorFinal;
                             }
                         });
-                        Object.entries(estado.comparacao.b).forEach(([key, value]) => {
-                            const input = document.getElementById(`comp-b-${key}`);
+                        Object.entries(comparacaoEscolhida.b).forEach(([key, value]) => {
+                            const inputKey = key === 'anoInicial' ? 'padraoAtual' : key;
+                            const input = document.getElementById(`comp-b-${inputKey}`);
                             if (!input) return;
                             if (input.type === 'checkbox') input.checked = Boolean(value);
                             else {
                                 let valorFinal = String(value);
+                                if (inputKey === 'padraoAtual' && Number(value) >= 1 && Number(value) <= 17) {
+                                    valorFinal = String(Math.min(94, Math.max(59, Number(value) + 58)));
+                                }
                                 if (key === 'aliquotaPrevcom' && Number(value) <= 1) {
                                     let valorPercentual = Number(value) * 100;
                                     if (valorPercentual < 1) valorPercentual *= 100;
