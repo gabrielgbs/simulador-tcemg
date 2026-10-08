@@ -23,6 +23,7 @@
             --disabled-bg: #e0e0e0;
             --disabled-color: #888888;
             --table-row-hover: #eaf1fb;
+            --color-desconto-text: #b02a37;
         }
 
         /* Variáveis do Tema Escuro */
@@ -44,6 +45,7 @@
             --disabled-bg: #2d3039;
             --disabled-color: #6c7280;
             --table-row-hover: #262c38;
+            --color-desconto-text: #ff8787;
         }
 
         body {
@@ -431,6 +433,11 @@
             background-color: var(--output-bg) !important;
             font-weight: bold;
             color: var(--color-liquido-text) !important;
+        }
+
+        .col-desconto {
+            color: var(--color-desconto-text) !important;
+            /*font-weight: 600;*/
         }
 
         /* Constantes Legais */
@@ -845,8 +852,8 @@
         </div>
         <div class="comparison-actions">
             <button type="button" class="comparison-action-btn" onclick="copiarParametrosComparacao('a', 'b')">Copiar A → B</button>
-            <button type="button" class="comparison-action-btn" onclick="copiarParametrosComparacao('b', 'a')">Copiar B → A</button>
             <button type="button" class="comparison-action-btn" onclick="trocarParametrosComparacao()">Trocar A ↔ B</button>
+            <button type="button" class="comparison-action-btn" onclick="copiarParametrosComparacao('b', 'a')">Copiar B → A</button>            
         </div>
     </div>
 
@@ -888,11 +895,11 @@
         <h3>Comparação dos Cenários</h3>
         <div class="comparison-summary">
             <div class="comparison-result-box">
-                <span class="label">Salário líquido — Cenário A</span>
+                <span class="label">Salário líquido - Cenário A</span>
                 <span id="comparacao-liquido-a" class="value">R$ 0,00</span>
             </div>
             <div class="comparison-result-box">
-                <span class="label">Salário líquido — Cenário B</span>
+                <span class="label">Salário líquido - Cenário B</span>
                 <span id="comparacao-liquido-b" class="value">R$ 0,00</span>
             </div>
             <div class="comparison-result-box destaque-diferenca">
@@ -1586,6 +1593,17 @@
 
             const tbody = document.getElementById('comparacao-tabela-corpo');
             tbody.innerHTML = '';
+            const linhasDesconto = [
+                'Abate-Teto',
+                'Desc. Previdência',
+                'Desc. Prevcom',
+                'Desc. IRPF',
+                'IRPF Férias',
+                'ASSCONTAS',
+                'AudTCE-MG',
+                'Outros Descontos',
+                'Total de Descontos'
+            ];
             linhas.forEach(([label, valorA, valorB]) => {
                 const tr = document.createElement('tr');
                 const valoresDiferentes = Math.abs(Number(valorA) - Number(valorB)) > 0.01;
@@ -1594,10 +1612,14 @@
                 }
                 const valorAFormatado = formatarMoeda(valorA);
                 const valorBFormatado = formatarMoeda(valorB);
+                const classeDesconto = linhasDesconto.includes(label)
+                    ? 'class="col-desconto"'
+                    : '';
+
                 tr.innerHTML = `
-                    <td>${label}</td>
-                    <td>${valorAFormatado}</td>
-                    <td>${valorBFormatado}</td>
+                    <td ${classeDesconto}>${label}</td>
+                    <td ${classeDesconto}>${valorAFormatado}</td>
+                    <td ${classeDesconto}>${valorBFormatado}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1606,7 +1628,7 @@
             linhaResumo.classList.add('total-row');
             const textoResultadoTabela = ehEmpate ? 'empate' : (valorDiferenca > 0 ? 'B vence A' : 'A vence B');
             linhaResumo.innerHTML = `
-                <td>Diferença no Salário Líquido + 13º</td>
+                <td>Diferença entre Cenários</td>
                 <td colspan="2">${valorDiferenca === 0 ? formatarMoeda(0) : `${valorDiferenca > 0 ? '+' : '-'}${formatarMoeda(Math.abs(valorDiferenca))}`} (${textoResultadoTabela})</td>
             `;
             tbody.appendChild(linhaResumo);
@@ -2131,15 +2153,15 @@
                     <td>${formatarMoeda(CONSTANTES.AUXILIO_SAUDE)}</td>
                     <td>${formatarMoeda(outrasVerbasIndenizatorias)}</td>
                     <td class="col-bruta">${formatarMoeda(remunBrutaTotal)}</td>
-                    <td class="col-destaque">${formatarMoeda(abateTeto)}</td>
-                    <td>${formatarMoeda(descPrevidencia)}</td>
-                    <td>${formatarMoeda(descPrevcom)}</td>
-                    <td>${formatarMoeda(descIRPF)}</td>
-                    <td>${formatarMoeda(impostoFerias)}</td>
-                    <td>${formatarMoeda(descAsscontas)}</td>
-                    <td>${formatarMoeda(descAudtce)}</td>
-                    <td>${formatarMoeda(descOutros)}</td>
-                    <td class="col-destaque">${formatarMoeda(totalDescontosComAbate)}</td>
+                    <td class="col-desconto">${formatarMoeda(abateTeto)}</td>
+                    <td class="col-desconto">${formatarMoeda(descPrevidencia)}</td>
+                    <td class="col-desconto">${formatarMoeda(descPrevcom)}</td>
+                    <td class="col-desconto">${formatarMoeda(descIRPF)}</td>
+                    <td class="col-desconto">${formatarMoeda(impostoFerias)}</td>
+                    <td class="col-desconto">${formatarMoeda(descAsscontas)}</td>
+                    <td class="col-desconto">${formatarMoeda(descAudtce)}</td>
+                    <td class="col-desconto">${formatarMoeda(descOutros)}</td>
+                    <td class="col-desconto col-destaque">${formatarMoeda(totalDescontosComAbate)}</td>
                     <td class="col-liquido">${formatarMoeda(remunLiquida)}</td>
                     <td class="col-decimo">${formatarMoeda(valorDecimoSalario)}</td>
                     <td class="col-liquido">${formatarMoeda(somaRemuneracaoLiquida)}</td>
