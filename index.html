@@ -1661,8 +1661,8 @@
                     const comparacaoPersistida = localStorage.getItem(CHAVE_STORAGE_COMPARACAO);
                     const comparacaoEscolhida = (estado.comparacao && estado.comparacao.a && estado.comparacao.b) ? estado.comparacao : (comparacaoPersistida ? JSON.parse(comparacaoPersistida) : null);
                     if (comparacaoEscolhida && comparacaoEscolhida.a && comparacaoEscolhida.b) {
-                        const filhosA = Array.isArray(comparacaoEscolhida.a.filhosCreche) && comparacaoEscolhida.a.filhosCreche.length > 0 ? comparacaoEscolhida.a.filhosCreche : [{ tipo: 'PADRAO', idadeInicial: 0 }];
-                        const filhosB = Array.isArray(comparacaoEscolhida.b.filhosCreche) && comparacaoEscolhida.b.filhosCreche.length > 0 ? comparacaoEscolhida.b.filhosCreche : [{ tipo: 'PADRAO', idadeInicial: 0 }];
+                        const filhosA = Array.isArray(comparacaoEscolhida.a.filhosCreche) ? comparacaoEscolhida.a.filhosCreche : [];
+                        const filhosB = Array.isArray(comparacaoEscolhida.b.filhosCreche) ? comparacaoEscolhida.b.filhosCreche : [];
                         renderizarListaFilhosCrecheComparacao('a', filhosA);
                         renderizarListaFilhosCrecheComparacao('b', filhosB);
 
