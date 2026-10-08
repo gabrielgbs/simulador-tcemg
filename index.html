@@ -1511,7 +1511,7 @@
 
             let descPrevcom = 0.0;
             if (parametros.regimePrevidencia === 'NOVO_PREVCOM') {
-                const basePrevcom = Math.max(0.0, remunEfetivaTributavel - CONSTANTES.TETO_RGPS);
+                const basePrevcom = Math.max(0.0, basePrevidencia - CONSTANTES.TETO_RGPS);
                 const aliquotaPrevcomDecimal = (Number(parametros.aliquotaPrevcom) || 0) / 100.0;
                 descPrevcom = basePrevcom * aliquotaPrevcomDecimal;
             }
@@ -2122,7 +2122,7 @@
 
                 let descPrevcom = 0.0;
                 if (regimePrev === "NOVO_PREVCOM") {
-                    const basePrevcomAposAbate = Math.max(0.0, remunEfetivaTributavel - CONSTANTES.TETO_RGPS);
+                    const basePrevcomAposAbate = Math.max(0.0, basePrevidencia - CONSTANTES.TETO_RGPS);
                     descPrevcom = basePrevcomAposAbate * aliquotaPrevcom;
                 }
 
