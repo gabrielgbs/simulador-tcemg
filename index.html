@@ -544,6 +544,10 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         .comparison-result-box.destaque-diferenca {
@@ -898,14 +902,14 @@
                 <span class="label">Salário líquido - Cenário A</span>
                 <span id="comparacao-liquido-a" class="value">R$ 0,00</span>
             </div>
-            <div class="comparison-result-box">
-                <span class="label">Salário líquido - Cenário B</span>
-                <span id="comparacao-liquido-b" class="value">R$ 0,00</span>
-            </div>
             <div class="comparison-result-box destaque-diferenca">
                 <span class="label">Diferença líquida</span>
                 <span id="comparacao-diferenca-liquida" class="value">R$ 0,00</span>
             </div>
+            <div class="comparison-result-box">
+                <span class="label">Salário líquido - Cenário B</span>
+                <span id="comparacao-liquido-b" class="value">R$ 0,00</span>
+            </div>            
         </div>
         <table class="comparison-table">
             <thead>
