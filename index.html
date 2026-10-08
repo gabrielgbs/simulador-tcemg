@@ -1605,8 +1605,20 @@
                 'Total de Descontos'
             ];
             linhas.forEach(([label, valorA, valorB]) => {
+
+                const ambosZero =
+                    Math.abs(Number(valorA)) < 0.01 &&
+                    Math.abs(Number(valorB)) < 0.01;
+
+                if (ambosZero) {
+                    return;
+                }
+
                 const tr = document.createElement('tr');
-                const valoresDiferentes = Math.abs(Number(valorA) - Number(valorB)) > 0.01;
+
+                const valoresDiferentes =
+                    Math.abs(Number(valorA) - Number(valorB)) > 0.01;
+
                 if (valoresDiferentes) {
                     tr.classList.add('diff-row');
                 }
