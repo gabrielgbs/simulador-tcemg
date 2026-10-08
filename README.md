@@ -8,6 +8,7 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 2. Navegue pelas abas para alterar parâmetros de carreira, previdência ou adicionais.
 3. Consulte a tabela com a simulação por ano.
 4. Revise os valores de remuneração bruta, descontos e líquida final.
+5. Opcionalmente, escolha o modo "Comparação", e compare 2 cenários de remuneração diferentes
 
 ## O que o simulador considera
 
@@ -27,7 +28,6 @@ Simulador web para estimar a evolução salarial e a remuneração líquida de u
 
 - Adicionais por tempo de serviço
 - Variações no desconto da ASSCONTAS
-- Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
 - Carreira de Oficial de Controle Externo
 
 Caso você queira adicionar esses recursos, fico feliz em receber seu pull-request 😁
@@ -35,6 +35,7 @@ Caso você queira adicionar esses recursos, fico feliz em receber seu pull-reque
 ## Funcionalidades implementadas
 
 - Simulação por ano da carreira até o limite do padrão TC-94
+- Modo de comparação, estilo https://taes.com.br (eu vim da carreira de TAES, e essa funcionalidade me faz falta 😅)
 - Divisão de parâmetros de cálculo em abas para separar carreira, previdência e adicionais/descontos
 - Cálculo de remuneração bruta e líquida final
 - Aplicação de reajuste inflacionário projetado
