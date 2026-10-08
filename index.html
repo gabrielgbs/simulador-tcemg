@@ -246,6 +246,14 @@
             flex-shrink: 0;
         }
 
+        .form-group.campo-desabilitado {
+            opacity: 0.65;
+        }
+
+        .form-group.campo-desabilitado label {
+            color: var(--text-muted);
+        }
+
         .filho-creche-item {
             display: grid;
             grid-template-columns: auto minmax(0, 1fr);
@@ -745,7 +753,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="regimePrevidencia">Regime de Previdência:</label>
-                    <select id="regimePrevidencia" onchange="calcularSimulacao()">
+                    <select id="regimePrevidencia" onchange="atualizarCamposFilhos(); calcularSimulacao()">
                         <option value="NOVO_PREVCOM">Novo com Prevcom-MG</option>
                         <option value="NOVO_SEM_PREVCOM">Novo sem Prevcom-MG</option>
                         <option value="ANTIGO_RPPS">Antigo RPPS (Integral 16%)</option>
@@ -1240,13 +1248,18 @@
                         }
                         input.value = String(campo.value ?? campo.options?.[0]?.value ?? '');
                     }
-                    input.onchange = () => calcularComparacao();
+                    input.onchange = () => {
+                        atualizarEstadoAliquotaPrevcomComparacao();
+                        calcularComparacao();
+                    };
 
                     group.appendChild(label);
                     group.appendChild(input);
                     container.appendChild(group);
                 });
             });
+
+            atualizarEstadoAliquotaPrevcomComparacao();
 
             const valoresPadrao = {
                 a: { padraoAtual: 59, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
@@ -1288,6 +1301,8 @@
                 }
             });
 
+            atualizarEstadoAliquotaPrevcomComparacao();
+
             const filhosOrigem = obterFilhosCrecheComparacao(origem);
             renderizarListaFilhosCrecheComparacao(destino, filhosOrigem);
             calcularComparacao();
@@ -1318,6 +1333,8 @@
                     inputB.value = valorA;
                 }
             });
+
+            atualizarEstadoAliquotaPrevcomComparacao();
 
             renderizarListaFilhosCrecheComparacao('a', filhosBOriginais);
             renderizarListaFilhosCrecheComparacao('b', filhosAOriginais);
@@ -1719,6 +1736,9 @@
                         });
                     }
                 }
+
+                atualizarCamposFilhos();
+                atualizarEstadoAliquotaPrevcomComparacao();
             } catch (e) {
                 console.warn("Erro ao ler estado do localStorage:", e);
             }
@@ -1764,6 +1784,8 @@
 
             renderizarListaFilhosCreche();
             carregarEstado();
+            atualizarCamposFilhos();
+            atualizarEstadoAliquotaPrevcomComparacao();
             atualizarModoVisual();
             calcularSimulacao();
             calcularComparacao();
@@ -1883,9 +1905,30 @@
             });
             const selectRegime = document.getElementById('regimePrevidencia');
             const inputAliquotaPrevcom = document.getElementById('aliquotaPrevcom');
-            if (selectRegime && inputAliquotaPrevcom) {
-                inputAliquotaPrevcom.disabled = (selectRegime.value !== "NOVO_PREVCOM");
+            const groupAliquota = inputAliquotaPrevcom ? inputAliquotaPrevcom.closest('.form-group') : null;
+            const isPrevcomAtivo = selectRegime ? (selectRegime.value === "NOVO_PREVCOM") : false;
+            if (inputAliquotaPrevcom) {
+                inputAliquotaPrevcom.disabled = !isPrevcomAtivo;
             }
+            if (groupAliquota) {
+                groupAliquota.classList.toggle('campo-desabilitado', !isPrevcomAtivo);
+            }
+        }
+
+        function atualizarEstadoAliquotaPrevcomComparacao() {
+            ['a', 'b'].forEach((codigo) => {
+                const selectRegime = document.getElementById(`comp-${codigo}-regimePrevidencia`);
+                const inputAliquotaPrevcom = document.getElementById(`comp-${codigo}-aliquotaPrevcom`);
+                const groupAliquota = inputAliquotaPrevcom ? inputAliquotaPrevcom.closest('.form-group') : null;
+                const isPrevcomAtivo = selectRegime ? (selectRegime.value === 'NOVO_PREVCOM') : false;
+
+                if (inputAliquotaPrevcom) {
+                    inputAliquotaPrevcom.disabled = !isPrevcomAtivo;
+                }
+                if (groupAliquota) {
+                    groupAliquota.classList.toggle('campo-desabilitado', !isPrevcomAtivo);
+                }
+            });
         }
 
         function obterFilhosCreche() {
