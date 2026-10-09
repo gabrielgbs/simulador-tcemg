@@ -1633,6 +1633,15 @@
             ];
             linhas.forEach(([label, valorA, valorB]) => {
 
+                const semDecimoNosDoisCenarios =
+                    label === 'Remuneração Líquida + 13º' &&
+                    cenarioA.valorDecimo === 0 &&
+                    cenarioB.valorDecimo === 0;
+
+                if (semDecimoNosDoisCenarios) {
+                    return;
+                }
+
                 const ambosZero =
                     Math.abs(Number(valorA)) < 0.01 &&
                     Math.abs(Number(valorB)) < 0.01;
