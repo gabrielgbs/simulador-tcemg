@@ -1296,8 +1296,8 @@
             atualizarEstadoAliquotaPrevcomComparacao();
 
             const valoresPadrao = {
-                a: { padraoAtual: 59, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
-                b: { padraoAtual: 68, pontosADE: 60, avancoTitulacao: 2, funcaoGratificada: 'FG-1', correcaoInflacao: 3, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 1, decimoTerceiroSalario: 'SEGUNDA', outrasVerbasIndenizatorias: 250, feriasDias: 15, associadoAsscontas: false, associadoAudtce: true, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 100 }
+                a: { padraoAtual: 59, pontosADE: 0,   avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 },
+                b: { padraoAtual: 59, pontosADE: 100, avancoTitulacao: 0, funcaoGratificada: 'Nenhuma', correcaoInflacao: 0, regimePrevidencia: 'NOVO_PREVCOM', aliquotaPrevcom: 7.5, qtdDependentesIRPF: 0, decimoTerceiroSalario: 'NAO', outrasVerbasIndenizatorias: 0, feriasDias: 0, associadoAsscontas: false, associadoAudtce: false, incideAdePrev: true, incideFuncaoPrev: true, outrosDescontos: 0 }
             };
 
             Object.keys(valoresPadrao).forEach((codigo) => {
@@ -1310,7 +1310,7 @@
                         input.value = String(value);
                     }
                 });
-                renderizarListaFilhosCrecheComparacao(codigo, [{ tipo: 'PADRAO', idadeInicial: 0 }]);
+                renderizarListaFilhosCrecheComparacao(codigo, []);
             });
         }
 
