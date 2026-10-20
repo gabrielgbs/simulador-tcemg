@@ -677,7 +677,42 @@
 
         .comparison-table tr.diff-row td {
             font-weight: 700;
-            background: var(--blue-highlight-bg);
+        }
+
+        .comp-bruta {
+            color: var(--blue-highlight);
+            font-weight: bold;
+            background-color: var(--blue-highlight-bg);
+        }
+
+        .comp-liquido {
+            background-color: var(--output-bg);
+            color: var(--color-liquido-text);
+            font-weight: bold;
+        }
+
+        .comp-desconto {
+            color: var(--color-desconto-text);
+        }
+
+        .comparison-table tbody tr:hover td.comp-liquido,
+        .comparison-table tbody tr:hover td.comp-bruta,
+        .comparison-table tbody tr:hover td.comp-decimo {
+            filter: brightness(0.96);
+        }
+
+        .comparison-table thead th:first-child {
+            border-top-left-radius: 8px;
+        }
+
+        .comparison-table thead th:last-child {
+            border-top-right-radius: 8px;
+        }
+
+        [data-theme="dark"] .comparison-table tbody tr:hover td.comp-liquido,
+        [data-theme="dark"] .comparison-table tbody tr:hover td.comp-bruta,
+        [data-theme="dark"] .comparison-table tbody tr:hover td.comp-decimo {
+            filter: brightness(1.15);
         }
 
         .comp-bruta {
@@ -1768,14 +1803,13 @@
 
                 const tr = document.createElement('tr');
 
-                /* -- Será que tiro isso?
                 const valoresDiferentes =
                     Math.abs(Number(valorA) - Number(valorB)) > 0.01;
                 
                 if (valoresDiferentes) {
                     tr.classList.add('diff-row');
                 }
-                */
+
                 const valorAFormatado = formatarMoeda(valorA);
                 const valorBFormatado = formatarMoeda(valorB);
                 const classeDesconto = linhasDesconto.includes(label)
